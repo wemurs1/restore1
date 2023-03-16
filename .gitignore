@@ -478,3 +478,4 @@ $RECYCLE.BIN/
 restore/API/store.db
 restore/API/store.db-shm
 restore/API/store.db-wal
+restore/API/appsettings.json
