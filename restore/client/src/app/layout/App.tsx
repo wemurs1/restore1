@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Catalog from '../../features/catalog/Catalog';
 import { Product } from '../models/product';
+import Header from './Header';
 
 function App() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -26,10 +27,10 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Re-Store</h1>
+    <Fragment>
+      <Header />
       <Catalog products={products} addProduct={addProduct} />
-    </div>
+    </Fragment>
   );
 }
 

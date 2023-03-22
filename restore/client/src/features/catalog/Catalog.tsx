@@ -9,7 +9,7 @@ interface Props {
 
 function Catalog({ products, addProduct }: Props) {
   return (
-    <Container>
+    <Container style={{ marginTop: '80px' }}>
       <ProductList products={products} />
       <Button onClick={addProduct} variant='primary'>
         Add Product

@@ -1,4 +1,4 @@
-import { ListGroup } from 'react-bootstrap';
+import { Col, Container, Row } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
 import ProductCard from './ProductCard';
 
@@ -8,10 +8,14 @@ interface Props {
 
 export default function ProductList({ products }: Props) {
   return (
-    <ListGroup>
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </ListGroup>
+    <Container>
+      <Row>
+        {products.map((product) => (
+          <Col xs={3} className='pb-4' key={product.id}>
+            <ProductCard product={product} />{' '}
+          </Col>
+        ))}
+      </Row>
+    </Container>
   );
 }
