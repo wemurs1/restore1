@@ -19,19 +19,25 @@ export default function ProductCard({ product }: Props) {
                 {product.name.charAt(0).toUpperCase()}
               </div>
             </Col>
-            <Col xs={10}>{product.name}</Col>
+            <Col
+              xs={10}
+              style={{ fontWeight: 'bold' }}
+              className='text-primary'
+            >
+              {product.name}
+            </Col>
           </Row>
         </Card.Header>
         <Card.Img
           variant='top'
           style={{ height: 140, width: 140 }}
-          className='d-block, mx-auto'
+          className='d-flex, mx-auto'
           src={product.pictureUrl}
           alt={product.name}
         />
         <Card.Body>
           <Card.Text as='h5' color='secondary'>
-            {product.price}
+            ${(product.price / 100).toFixed(2)}
           </Card.Text>
           <Card.Text as='body'>
             {product.brand} / {product.type}
