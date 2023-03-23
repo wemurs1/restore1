@@ -1,19 +1,20 @@
-import { Button, Container } from 'react-bootstrap';
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
 import ProductList from './ProductList';
 
-interface Props {
-  products: Product[];
-  addProduct: () => void;
-}
+function Catalog() {
+  const [products, setProducts] = useState<Product[]>([]);
 
-function Catalog({ products, addProduct }: Props) {
+  useEffect(() => {
+    fetch('http://localhost:5000/api/products')
+      .then((response) => response.json())
+      .then((data) => setProducts(data));
+  }, []);
+
   return (
     <Container style={{ marginTop: '80px' }}>
       <ProductList products={products} />
-      <Button onClick={addProduct} variant='primary'>
-        Add Product
-      </Button>
     </Container>
   );
 }

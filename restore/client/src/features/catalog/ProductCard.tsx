@@ -39,7 +39,7 @@ export default function ProductCard({ product }: Props) {
           <Card.Text as='h5' color='secondary'>
             ${(product.price / 100).toFixed(2)}
           </Card.Text>
-          <Card.Text as='body'>
+          <Card.Text>
             {product.brand} / {product.type}
           </Card.Text>
         </Card.Body>
