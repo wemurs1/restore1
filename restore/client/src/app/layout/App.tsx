@@ -1,8 +1,9 @@
-import { Fragment, useState } from 'react';
-import Catalog from '../../features/catalog/Catalog';
+import { useState } from 'react';
+import { Container } from 'react-bootstrap';
+import { Outlet } from 'react-router-dom';
 import Header from './Header';
 
-function App() {
+export default function App() {
   const [darkMode, setDarkMode] = useState(false);
 
   const onChange = () => {
@@ -13,9 +14,9 @@ function App() {
   return (
     <div style={{ backgroundColor: '#eaeaea' }}>
       <Header darkMode={darkMode} onChange={onChange} />
-      <Catalog />
+      <Container style={{ marginTop: '40px' }}>
+        <Outlet />
+      </Container>
     </div>
   );
 }
-
-export default App;

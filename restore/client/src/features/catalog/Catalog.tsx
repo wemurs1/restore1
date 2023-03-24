@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Container } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
 import ProductList from './ProductList';
 
@@ -13,9 +12,7 @@ function Catalog() {
   }, []);
 
   return (
-    <Container style={{ marginTop: '40px' }}>
       <ProductList products={products} />
-    </Container>
   );
 }
 
