@@ -13,7 +13,7 @@ function Catalog() {
   }, []);
 
   return (
-    <Container style={{ marginTop: '80px' }}>
+    <Container style={{ marginTop: '40px' }}>
       <ProductList products={products} />
     </Container>
   );

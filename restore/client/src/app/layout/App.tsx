@@ -11,10 +11,10 @@ function App() {
   };
 
   return (
-    <Fragment>
+    <div style={{ backgroundColor: '#eaeaea' }}>
       <Header darkMode={darkMode} onChange={onChange} />
       <Catalog />
-    </Fragment>
+    </div>
   );
 }
 

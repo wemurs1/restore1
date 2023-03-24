@@ -8,7 +8,7 @@ interface Props {
 export default function ProductCard({ product }: Props) {
   return (
     <>
-      <Card style={{ height: 450 }} className='shadow-sm'>
+      <Card style={{ height: 450, marginTop: 20 }} className='shadow-sm'>
         <Card.Header style={{ height: 60 }}>
           <Row>
             <Col xs={2}>
