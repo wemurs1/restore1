@@ -1,4 +1,16 @@
-import { Navbar } from 'react-bootstrap';
+import { ListGroup, ListGroupItem, Navbar } from 'react-bootstrap';
+import { NavLink } from 'react-router-dom';
+
+const midLinks = [
+  { title: 'catalog', path: '/catalog' },
+  { title: 'about', path: '/about' },
+  { title: 'contact', path: '/contact' },
+];
+
+const rightLinks = [
+  { title: 'login', path: '/login' },
+  { title: 'register', path: '/register' },
+];
 
 interface Props {
   darkMode: boolean;
@@ -21,6 +33,19 @@ function Header({ darkMode, onChange }: Props) {
               onChange={onChange}
             />
           </div>
+          <ul style={{ display: 'flex', listStyle: 'none' }}>
+            {midLinks.map(({ title, path }) => (
+              <li key={path}>
+                <NavLink
+                  style={{ color: 'white', textDecoration: 'none' }}
+                  className={'me-3 h6'}
+                  to={path}
+                >
+                  {title.toUpperCase()}
+                </NavLink>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </Navbar>

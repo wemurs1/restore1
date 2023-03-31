@@ -12,9 +12,9 @@ export default function App() {
   };
 
   return (
-    <div style={{ backgroundColor: '#eaeaea' }}>
+    <div style={{ backgroundColor: '#eaeaea', height: '100vh' }}>
       <Header darkMode={darkMode} onChange={onChange} />
-      <Container style={{ marginTop: '40px', height: '100vh' }}>
+      <Container style={{ marginTop: '55px' }}>
         <Outlet />
       </Container>
     </div>
