@@ -1,5 +1,6 @@
 import { Card, Col, Row } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
+import { Link } from 'react-router-dom';
 
 interface Props {
   product: Product;
@@ -45,7 +46,9 @@ export default function ProductCard({ product }: Props) {
         </Card.Body>
         <Card.Body>
           <Card.Link>Add to cart</Card.Link>
-          <Card.Link>View</Card.Link>
+          <Card.Link as={Link} to={`/catalog/${product.id}`}>
+            View
+          </Card.Link>
         </Card.Body>
       </Card>
     </>
