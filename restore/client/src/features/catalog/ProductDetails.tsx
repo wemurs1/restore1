@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Product } from '../../app/models/product';
 import agent from '../../app/api/agent';
+import NotFound from '../../app/errors/NotFound';
 
 function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -18,7 +19,7 @@ function ProductDetails() {
 
   if (loading) return <h3>Loading...</h3>;
 
-  if (!product) return <h3>Product not found</h3>;
+  if (!product) return <NotFound />;
 
   return (
     <div className='row'>
