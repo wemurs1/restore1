@@ -1,5 +1,3 @@
-import { Container } from 'react-bootstrap';
-
 interface Props {
   message?: string;
 }
