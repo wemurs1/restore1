@@ -1,6 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import * as FaIcon from 'react-icons/fa';
+import { useStoreContext } from '../context/StoreContext';
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -19,6 +20,9 @@ interface Props {
 }
 
 function Header({ darkMode, onChange }: Props) {
+  const { basket } = useStoreContext();
+  const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
+
   return (
     <header
       className='d-flex flex-row align-items-center justify-content-between p-3 px-4 mb-3 
@@ -74,15 +78,17 @@ function Header({ darkMode, onChange }: Props) {
         }}
       >
         <li>
-          <Button size='lg' style={{ position: 'relative' }}>
-            <FaIcon.FaShoppingCart style={{ color: 'white' }} />
-            <div
-              className='cart-no'
-              style={{ color: 'blue', fontSize: 'small' }}
-            >
-              4
-            </div>
-          </Button>
+          <NavLink to='/basket'>
+            <Button size='lg' style={{ position: 'relative' }}>
+              <FaIcon.FaShoppingCart style={{ color: 'white' }} />
+              <div
+                className='cart-no'
+                style={{ color: 'blue', fontSize: 'small' }}
+              >
+                {itemCount}
+              </div>
+            </Button>
+          </NavLink>
         </li>
         {rightLinks.map(({ title, path }) => (
           <li key={path}>

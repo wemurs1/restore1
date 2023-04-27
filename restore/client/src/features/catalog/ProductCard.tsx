@@ -1,12 +1,26 @@
-import { Card, Col, Row } from 'react-bootstrap';
+import { Card, Col, Row, Spinner } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import agent from '../../app/api/agent';
+import { useStoreContext } from '../../app/context/StoreContext';
 
 interface Props {
   product: Product;
 }
 
 export default function ProductCard({ product }: Props) {
+  const { setBasket } = useStoreContext();
+  const [loading, setLoading] = useState(false);
+
+  function handleAddItem(productId: number) {
+    setLoading(true);
+    agent.Basket.addItem(productId)
+      .then((basket) => setBasket(basket))
+      .catch((error) => console.log(error))
+      .finally(() => setLoading(false));
+  }
+
   return (
     <>
       <Card style={{ height: 450, marginTop: 20 }} className='shadow-sm'>
@@ -45,7 +59,18 @@ export default function ProductCard({ product }: Props) {
           </Card.Text>
         </Card.Body>
         <Card.Body>
-          <Card.Link>Add to cart</Card.Link>
+          <Card.Link onClick={() => handleAddItem(product.id)}>
+            {loading && (
+              <Spinner
+                as='span'
+                animation='border'
+                size='sm'
+                role='status'
+                aria-hidden='true'
+              />
+            )}
+            Add to cart
+          </Card.Link>
           <Card.Link as={Link} to={`/catalog/${product.id}`}>
             View
           </Card.Link>
