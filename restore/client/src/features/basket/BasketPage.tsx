@@ -3,6 +3,7 @@ import * as FaIcon from 'react-icons/fa';
 import { useStoreContext } from '../../app/context/StoreContext';
 import { useState } from 'react';
 import agent from '../../app/api/agent';
+import BasketSummary from './BasketSummary';
 
 export default function BasketPage() {
   const { basket, setBasket, removeItem } = useStoreContext();
@@ -133,6 +134,12 @@ export default function BasketPage() {
           ))}
         </tbody>
       </Table>
+      <div className='row'>
+        <div className='col-6'></div>
+        <div className='col-6'>
+          <BasketSummary />
+        </div>
+      </div>
     </Container>
   );
 }
