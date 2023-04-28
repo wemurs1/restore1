@@ -6,22 +6,25 @@ import agent from '../../app/api/agent';
 
 export default function BasketPage() {
   const { basket, setBasket, removeItem } = useStoreContext();
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState({
+    loading: false,
+    name: '',
+  });
 
-  function handleAddItem(productId: number) {
-    setLoading(true);
+  function handleAddItem(productId: number, name: string) {
+    setStatus({ loading: true, name: name });
     agent.Basket.addItem(productId)
       .then((basket) => setBasket(basket))
       .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
+      .finally(() => setStatus({ loading: false, name: '' }));
   }
 
-  function handleRemoveItem(productId: number, quantity = 1) {
-    setLoading(true);
+  function handleRemoveItem(productId: number, quantity = 1, name: string) {
+    setStatus({ loading: true, name: name });
     agent.Basket.removeItem(productId, quantity)
       .then(() => removeItem(productId, quantity))
       .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
+      .finally(() => setStatus({ loading: false, name: '' }));
   }
 
   if (!basket) return <h3>Your basket is empty</h3>;
@@ -56,7 +59,8 @@ export default function BasketPage() {
               </td>
               <td>
                 <div className='d-flex text-center align-items-center mt-2'>
-                  {loading && (
+                  {status.loading &&
+                  status.name === 'minus' + item.productId ? (
                     <Spinner
                       as='span'
                       animation='border'
@@ -64,16 +68,35 @@ export default function BasketPage() {
                       role='status'
                       aria-hidden='true'
                     />
+                  ) : (
+                    <FaIcon.FaMinus
+                      className='text-danger me-2'
+                      onClick={() =>
+                        handleRemoveItem(
+                          item.productId,
+                          1,
+                          'minus' + item.productId
+                        )
+                      }
+                    ></FaIcon.FaMinus>
                   )}
-                  <FaIcon.FaMinus
-                    className='text-danger me-2'
-                    onClick={() => handleRemoveItem(item.productId)}
-                  ></FaIcon.FaMinus>
                   <span>{item.quantity}</span>
-                  <FaIcon.FaPlus
-                    className='text-success ms-2'
-                    onClick={() => handleAddItem(item.productId)}
-                  ></FaIcon.FaPlus>
+                  {status.loading && status.name === 'plus' + item.productId ? (
+                    <Spinner
+                      as='span'
+                      animation='border'
+                      size='sm'
+                      role='status'
+                      aria-hidden='true'
+                    />
+                  ) : (
+                    <FaIcon.FaPlus
+                      className='text-success ms-2'
+                      onClick={() =>
+                        handleAddItem(item.productId, 'plus' + item.productId)
+                      }
+                    ></FaIcon.FaPlus>
+                  )}
                 </div>
               </td>
               <td>
@@ -83,7 +106,8 @@ export default function BasketPage() {
               </td>
               <td>
                 <div className='mt-2'>
-                  {loading && (
+                  {status.loading &&
+                  status.name === 'delete' + item.productId ? (
                     <Spinner
                       as='span'
                       animation='border'
@@ -91,13 +115,18 @@ export default function BasketPage() {
                       role='status'
                       aria-hidden='true'
                     />
+                  ) : (
+                    <FaIcon.FaTrash
+                      className='text-danger'
+                      onClick={() =>
+                        handleRemoveItem(
+                          item.productId,
+                          item.quantity,
+                          'delete' + item.productId
+                        )
+                      }
+                    />
                   )}
-                  <FaIcon.FaTrash
-                    className='text-danger'
-                    onClick={() =>
-                      handleRemoveItem(item.productId, item.quantity)
-                    }
-                  />
                 </div>
               </td>
             </tr>
