@@ -12,7 +12,7 @@ export default function BasketSummary() {
     0
   );
 
-  const deliveryFee = subtotal > 100 ? 0 : 5;
+  const deliveryFee = subtotal > 10000 ? 0 : 500;
 
   return (
     <Fragment>
