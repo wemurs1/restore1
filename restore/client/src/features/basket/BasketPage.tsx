@@ -4,6 +4,7 @@ import { useStoreContext } from '../../app/context/StoreContext';
 import { useState } from 'react';
 import agent from '../../app/api/agent';
 import BasketSummary from './BasketSummary';
+import { currencyFormat } from '../../app/util/util';
 
 export default function BasketPage() {
   const { basket, setBasket, removeItem } = useStoreContext();
@@ -102,7 +103,7 @@ export default function BasketPage() {
               </td>
               <td>
                 <div className='mt-2'>
-                  ${((item.price * item.quantity) / 100).toFixed(2)}
+                  {currencyFormat(item.price * item.quantity)}
                 </div>
               </td>
               <td>

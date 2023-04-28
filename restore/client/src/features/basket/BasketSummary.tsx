@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { useStoreContext } from '../../app/context/StoreContext';
+import { currencyFormat } from '../../app/util/util';
 
 export default function BasketSummary() {
   const { basket } = useStoreContext();
@@ -17,17 +18,17 @@ export default function BasketSummary() {
     <Fragment>
       <div className='d-flex justify-content-between'>
         <div>Subtotal</div>
-        <div>${(subtotal / 100).toFixed(2)}</div>
+        <div>{currencyFormat(subtotal)}</div>
       </div>
       <hr />
       <div className='d-flex justify-content-between'>
         <div>Delivery fee *</div>
-        <div>${(deliveryFee / 100).toFixed(2)}</div>
+        <div>{currencyFormat(deliveryFee)}</div>
       </div>
       <hr />
       <div className='d-flex justify-content-between'>
         <div>Total</div>
-        <div>${((subtotal + deliveryFee) / 100).toFixed(2)}</div>
+        <div>{currencyFormat(subtotal + deliveryFee)}</div>
       </div>
       <hr />
       <div className='d-flex justify-content-between'>

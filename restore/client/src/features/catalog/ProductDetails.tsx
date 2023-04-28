@@ -4,6 +4,7 @@ import { Product } from '../../app/models/product';
 import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
 import LoadingComponent from '../../app/layout/LoadingComponent';
+import { currencyFormat } from '../../app/util/util';
 
 function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +41,7 @@ function ProductDetails() {
           style={{ fontWeight: 'bold', fontSize: '1.5em' }}
           className='text-primary'
         >
-          ${(product.price / 100).toFixed(2)}
+          {currencyFormat(product.price)}
         </h4>
         <div className='row'>
           <div className='col-4'>
