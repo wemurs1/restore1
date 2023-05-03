@@ -128,6 +128,7 @@ function ProductDetails() {
               className='btn btn-primary w-100'
               style={{ height: '40px', marginTop: '30px' }}
               onClick={handleUpdateCart}
+              disabled={item?.quantity === quantity}
             >
               {submitting && (
                 <Spinner
