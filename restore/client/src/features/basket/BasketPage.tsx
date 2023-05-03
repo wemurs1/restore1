@@ -5,6 +5,7 @@ import { useState } from 'react';
 import agent from '../../app/api/agent';
 import BasketSummary from './BasketSummary';
 import { currencyFormat } from '../../app/util/util';
+import { Link } from 'react-router-dom';
 
 export default function BasketPage() {
   const { basket, setBasket, removeItem } = useStoreContext();
@@ -139,6 +140,9 @@ export default function BasketPage() {
         <div className='col-6'></div>
         <div className='col-6'>
           <BasketSummary />
+          <Link to='/checkout'>
+            <button className='btn btn-primary w-100 mt-2'>Checkout</button>
+          </Link>
         </div>
       </div>
     </Container>

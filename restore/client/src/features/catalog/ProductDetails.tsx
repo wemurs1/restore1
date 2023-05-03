@@ -27,7 +27,7 @@ function ProductDetails() {
   }, [id, item]);
 
   function handleInputChange(event: any) {
-    if (event.target.value > 0) setQuantity(parseInt(event.target.value));
+    if (event.target.value >= 0) setQuantity(parseInt(event.target.value));
   }
 
   function handleUpdateCart() {
@@ -128,7 +128,9 @@ function ProductDetails() {
               className='btn btn-primary w-100'
               style={{ height: '40px', marginTop: '30px' }}
               onClick={handleUpdateCart}
-              disabled={item?.quantity === quantity}
+              disabled={
+                item?.quantity === quantity || (!item && quantity === 0)
+              }
             >
               {submitting && (
                 <Spinner
