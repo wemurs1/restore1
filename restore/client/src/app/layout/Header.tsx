@@ -1,7 +1,7 @@
 import { Button } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import * as FaIcon from 'react-icons/fa';
-import { useStoreContext } from '../context/StoreContext';
+import { useAppSelector } from '../store/configureStore';
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -20,7 +20,7 @@ interface Props {
 }
 
 function Header({ darkMode, onChange }: Props) {
-  const { basket } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (

@@ -5,11 +5,13 @@ import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
 import LoadingComponent from '../../app/layout/LoadingComponent';
 import { currencyFormat } from '../../app/util/util';
-import { useStoreContext } from '../../app/context/StoreContext';
 import { Form, Spinner } from 'react-bootstrap';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { removeItem, setBasket } from '../basket/basketSlice';
 
 function ProductDetails() {
-  const { basket, setBasket, removeItem } = useStoreContext();
+  const dispatch = useAppDispatch();
+  const { basket } = useAppSelector((state) => state.basket);
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -35,13 +37,17 @@ function ProductDetails() {
     if (!item || quantity > item.quantity) {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
       agent.Basket.addItem(product?.id!, updatedQuantity)
-        .then((basket) => setBasket(basket))
+        .then((basket) => dispatch(setBasket(basket)))
         .catch((error) => console.log(error))
         .finally(() => setSubmitting(false));
     } else {
       const updatedQuantity = item.quantity - quantity;
       agent.Basket.removeItem(product?.id!, updatedQuantity)
-        .then(() => removeItem(product?.id!, updatedQuantity))
+        .then(() =>
+          dispatch(
+            removeItem({ productId: product?.id!, quantity: updatedQuantity })
+          )
+        )
         .catch((error) => console.log(error))
         .finally(() => setSubmitting(false));
     }
