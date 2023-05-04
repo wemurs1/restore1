@@ -7,16 +7,18 @@ import LoadingComponent from '../../app/layout/LoadingComponent';
 import { currencyFormat } from '../../app/util/util';
 import { Form, Spinner } from 'react-bootstrap';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
-import { removeItem, setBasket } from '../basket/basketSlice';
+import {
+  addBasketItemAsync,
+  removeBasketItemAsync,
+} from '../basket/basketSlice';
 
 function ProductDetails() {
   const dispatch = useAppDispatch();
-  const { basket } = useAppSelector((state) => state.basket);
+  const { basket, status } = useAppSelector((state) => state.basket);
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
@@ -33,23 +35,22 @@ function ProductDetails() {
   }
 
   function handleUpdateCart() {
-    setSubmitting(true);
     if (!item || quantity > item.quantity) {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
-      agent.Basket.addItem(product?.id!, updatedQuantity)
-        .then((basket) => dispatch(setBasket(basket)))
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        addBasketItemAsync({
+          productId: item?.productId!,
+          quantity: updatedQuantity,
+        })
+      );
     } else {
       const updatedQuantity = item.quantity - quantity;
-      agent.Basket.removeItem(product?.id!, updatedQuantity)
-        .then(() =>
-          dispatch(
-            removeItem({ productId: product?.id!, quantity: updatedQuantity })
-          )
-        )
-        .catch((error) => console.log(error))
-        .finally(() => setSubmitting(false));
+      dispatch(
+        removeBasketItemAsync({
+          productId: item?.productId!,
+          quantity: updatedQuantity,
+        })
+      );
     }
   }
 
@@ -138,7 +139,7 @@ function ProductDetails() {
                 item?.quantity === quantity || (!item && quantity === 0)
               }
             >
-              {submitting && (
+              {status.includes('pendingRemoveItem' + item?.productId) && (
                 <Spinner
                   as='span'
                   animation='border'

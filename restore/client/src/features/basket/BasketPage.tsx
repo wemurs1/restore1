@@ -1,36 +1,14 @@
 import { Container, Spinner, Table } from 'react-bootstrap';
 import * as FaIcon from 'react-icons/fa';
-import { useState } from 'react';
-import agent from '../../app/api/agent';
 import BasketSummary from './BasketSummary';
 import { currencyFormat } from '../../app/util/util';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
-import { removeItem, setBasket } from './basketSlice';
+import { addBasketItemAsync, removeBasketItemAsync } from './basketSlice';
 
 export default function BasketPage() {
   const dispatch = useAppDispatch();
-  const { basket } = useAppSelector((state) => state.basket);
-  const [status, setStatus] = useState({
-    loading: false,
-    name: '',
-  });
-
-  function handleAddItem(productId: number, name: string) {
-    setStatus({ loading: true, name: name });
-    agent.Basket.addItem(productId)
-      .then((basket) => dispatch(setBasket(basket)))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false, name: '' }));
-  }
-
-  function handleRemoveItem(productId: number, quantity = 1, name: string) {
-    setStatus({ loading: true, name: name });
-    agent.Basket.removeItem(productId, quantity)
-      .then(() => dispatch(removeItem({ productId, quantity })))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: false, name: '' }));
-  }
+  const { basket, status } = useAppSelector((state) => state.basket);
 
   if (!basket) return <h3>Your basket is empty</h3>;
 
@@ -64,8 +42,7 @@ export default function BasketPage() {
               </td>
               <td>
                 <div className='d-flex text-center align-items-center mt-2'>
-                  {status.loading &&
-                  status.name === 'minus' + item.productId ? (
+                  {status === 'pendingRemoveItem' + item.productId + 'rem' ? (
                     <Spinner
                       as='span'
                       animation='border'
@@ -77,16 +54,18 @@ export default function BasketPage() {
                     <FaIcon.FaMinus
                       className='text-danger me-2'
                       onClick={() =>
-                        handleRemoveItem(
-                          item.productId,
-                          1,
-                          'minus' + item.productId
+                        dispatch(
+                          removeBasketItemAsync({
+                            productId: item.productId,
+                            quantity: 1,
+                            name: 'rem',
+                          })
                         )
                       }
                     ></FaIcon.FaMinus>
                   )}
                   <span>{item.quantity}</span>
-                  {status.loading && status.name === 'plus' + item.productId ? (
+                  {status === 'pendingAddItem' + item.productId ? (
                     <Spinner
                       as='span'
                       animation='border'
@@ -98,7 +77,9 @@ export default function BasketPage() {
                     <FaIcon.FaPlus
                       className='text-success ms-2'
                       onClick={() =>
-                        handleAddItem(item.productId, 'plus' + item.productId)
+                        dispatch(
+                          addBasketItemAsync({ productId: item.productId })
+                        )
                       }
                     ></FaIcon.FaPlus>
                   )}
@@ -111,8 +92,7 @@ export default function BasketPage() {
               </td>
               <td>
                 <div className='mt-2'>
-                  {status.loading &&
-                  status.name === 'delete' + item.productId ? (
+                  {status === 'pendingRemoveItem' + item.productId + 'del' ? (
                     <Spinner
                       as='span'
                       animation='border'
@@ -124,10 +104,12 @@ export default function BasketPage() {
                     <FaIcon.FaTrash
                       className='text-danger'
                       onClick={() =>
-                        handleRemoveItem(
-                          item.productId,
-                          item.quantity,
-                          'delete' + item.productId
+                        dispatch(
+                          removeBasketItemAsync({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            name: 'del',
+                          })
                         )
                       }
                     />

@@ -1,11 +1,9 @@
 import { Card, Col, Row, Spinner } from 'react-bootstrap';
 import { Product } from '../../app/models/product';
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
-import agent from '../../app/api/agent';
 import { currencyFormat } from '../../app/util/util';
-import { useAppDispatch } from '../../app/store/configureStore';
-import { setBasket } from '../basket/basketSlice';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { addBasketItemAsync } from '../basket/basketSlice';
 
 interface Props {
   product: Product;
@@ -13,15 +11,7 @@ interface Props {
 
 export default function ProductCard({ product }: Props) {
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
-
-  function handleAddItem(productId: number) {
-    setLoading(true);
-    agent.Basket.addItem(productId)
-      .then((basket) => dispatch(setBasket(basket)))
-      .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
-  }
+  const { status } = useAppSelector((state) => state.basket);
 
   return (
     <>
@@ -61,8 +51,12 @@ export default function ProductCard({ product }: Props) {
           </Card.Text>
         </Card.Body>
         <Card.Body>
-          <Card.Link onClick={() => handleAddItem(product.id)}>
-            {loading && (
+          <Card.Link
+            onClick={() =>
+              dispatch(addBasketItemAsync({ productId: product.id }))
+            }
+          >
+            {status.includes('pendingAddItem' + product.id) && (
               <Spinner
                 as='span'
                 animation='border'
