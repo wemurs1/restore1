@@ -36,7 +36,7 @@ function ProductDetails() {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
       dispatch(
         addBasketItemAsync({
-          productId: item?.productId!,
+          productId: parseInt(id!),
           quantity: updatedQuantity,
         })
       );
@@ -44,7 +44,7 @@ function ProductDetails() {
       const updatedQuantity = item.quantity - quantity;
       dispatch(
         removeBasketItemAsync({
-          productId: item?.productId!,
+          productId: parseInt(id!),
           quantity: updatedQuantity,
         })
       );
@@ -137,7 +137,7 @@ function ProductDetails() {
                 item?.quantity === quantity || (!item && quantity === 0)
               }
             >
-              {status.includes('pendingRemoveItem' + item?.productId) && (
+              {status.includes('pending') && (
                 <Spinner
                   as='span'
                   animation='border'
