@@ -26,7 +26,9 @@ namespace API.Controllers
                 .AsQueryable();
 
             var products = await PagedList<Product>.ToPagedList(query, productParams.PageNumber, productParams.PageSize);
-            Response.Headers.Add("Pagination", JsonSerializer.Serialize(products.MetaData));
+
+            Response.AddPaginationheader(products.MetaData);
+
             return products;
         }
 
@@ -36,6 +38,15 @@ namespace API.Controllers
             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
             if (product == null) return NotFound();
             return product;
+        }
+
+        [HttpGet("filters")]
+        public async Task<IActionResult> GetFilters()
+        {
+            var brands = await _context.Products.Select(p => p.Brand).Distinct().ToListAsync();
+            var types = await _context.Products.Select(p => p.Type).Distinct().ToListAsync();
+
+            return Ok(new { brands, types });
         }
     }
 }
