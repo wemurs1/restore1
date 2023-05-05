@@ -11,7 +11,7 @@ export default function ProductList({ products }: Props) {
     <Container>
       <Row>
         {products.map((product) => (
-          <Col xs={3} className='pb-4' key={product.id}>
+          <Col xs={4} className='pb-4' key={product.id}>
             <ProductCard product={product} />{' '}
           </Col>
         ))}

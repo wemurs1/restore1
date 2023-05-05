@@ -17,13 +17,23 @@ function Catalog() {
 
   useEffect(() => {
     if (!productsLoaded) dispatch(fetchProductsAsync());
+  }, [dispatch, productsLoaded]);
+
+  useEffect(() => {
     if (!filtersLoaded) dispatch(fetchFiltersAsync());
-  }, [dispatch, productsLoaded, filtersLoaded]);
+  }, [dispatch, filtersLoaded]);
 
   if (status.includes('pending'))
     return <LoadingComponent message='Loading products...' />;
 
-  return <ProductList products={products} />;
+  return (
+    <div className='row'>
+      <div className='col-3'></div>
+      <div className='col-9'>
+        <ProductList products={products} />
+      </div>
+    </div>
+  );
 }
 
 export default Catalog;
