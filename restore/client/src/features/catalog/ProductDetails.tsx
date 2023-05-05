@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Product } from '../../app/models/product';
-import agent from '../../app/api/agent';
 import NotFound from '../../app/errors/NotFound';
 import LoadingComponent from '../../app/layout/LoadingComponent';
 import { currencyFormat } from '../../app/util/util';
@@ -11,24 +9,23 @@ import {
   addBasketItemAsync,
   removeBasketItemAsync,
 } from '../basket/basketSlice';
+import { fetchProductAsync, productSelectors } from './catalogSlice';
 
 function ProductDetails() {
   const dispatch = useAppDispatch();
   const { basket, status } = useAppSelector((state) => state.basket);
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
+  const product = useAppSelector((state) =>
+    productSelectors.selectById(state, id!)
+  );
   const [quantity, setQuantity] = useState(0);
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
     if (item) setQuantity(item.quantity);
-    id &&
-      agent.Catalog.details(parseInt(id))
-        .then((response) => setProduct(response))
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-  }, [id, item]);
+    if (!product) dispatch(fetchProductAsync(parseInt(id!)));
+  }, [id, item, dispatch, product]);
 
   function handleInputChange(event: any) {
     if (event.target.value >= 0) setQuantity(parseInt(event.target.value));
@@ -54,7 +51,8 @@ function ProductDetails() {
     }
   }
 
-  if (loading) return <LoadingComponent message='Loading product...' />;
+  if (productStatus.includes('pending'))
+    return <LoadingComponent message='Loading product...' />;
 
   if (!product) return <NotFound />;
 
