@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootswatch/dist/united/bootstrap.min.css';
+import 'react-paginate/theme/basic/react-paginate.css';
 import './app/layout/styles.css';
 import reportWebVitals from './reportWebVitals';
 import { RouterProvider } from 'react-router-dom';
