@@ -28,7 +28,7 @@ export default function CheckboxButtons({ items, checked, onChange }: Props) {
             type='checkbox'
             value={item}
             label={item}
-            checked={checkedItems.indexOf(item) !== -1}
+            defaultChecked={checkedItems.indexOf(item) !== -1}
             onClick={() => handleChecked(item)}
           />
         );

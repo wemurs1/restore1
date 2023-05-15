@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import ProductList from './ProductList';
 import LoadingComponent from '../../app/layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
@@ -6,13 +6,13 @@ import {
   fetchFiltersAsync,
   fetchProductsAsync,
   productSelectors,
+  setPageNumber,
   setProductParams,
 } from './catalogSlice';
-import { Form } from 'react-bootstrap';
-import ReactPaginate from 'react-paginate';
 import ProductSearch from './ProductSearch';
 import RadioButtonGroup from '../../app/components/RadioButtonGroup';
 import CheckboxButtons from '../../app/components/CheckboxButtons';
+import AppPagination from '../../app/components/AppPagination';
 
 const sortOptions = [
   { value: 'name', label: 'Alphabetical' },
@@ -29,9 +29,9 @@ function Catalog() {
     brands,
     types,
     productParams,
+    metaData,
   } = useAppSelector((state) => state.catalog);
   const dispatch = useAppDispatch();
-  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (!productsLoaded) dispatch(fetchProductsAsync());
@@ -41,12 +41,7 @@ function Catalog() {
     if (!filtersLoaded) dispatch(fetchFiltersAsync());
   }, [dispatch, filtersLoaded]);
 
-  const handlePageClick = (event: any) => {
-    console.log(event.selected);
-    setCurrentPage(event.selected + 1);
-  };
-
-  if (status.includes('pending'))
+  if (status.includes('pending') || !metaData)
     return <LoadingComponent message='Loading products...' />;
 
   return (
@@ -85,26 +80,12 @@ function Catalog() {
       </div>
       <div className='col-9'>
         <ProductList products={products} />
-        <div className='row'>
-          <div className='col-3'>
-            <p>Displaying 1-6 of 20 items</p>
-          </div>
-          <div className='col-9'>
-            <div>
-              <ReactPaginate
-                breakLabel='...'
-                nextLabel='next >'
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={2}
-                pageCount={10}
-                previousLabel='< previous'
-                renderOnZeroPageCount={null}
-                className='react-paginate'
-                forcePage={currentPage - 1}
-              />
-            </div>
-          </div>
-        </div>
+        <AppPagination
+          metaData={metaData}
+          onPageChange={(page: number) =>
+            dispatch(setPageNumber({ pageNumber: page }))
+          }
+        />
       </div>
     </div>
   );
