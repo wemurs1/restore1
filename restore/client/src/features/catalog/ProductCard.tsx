@@ -15,7 +15,7 @@ export default function ProductCard({ product }: Props) {
 
   return (
     <>
-      <Card style={{ height: 450, marginTop: 20 }} className='shadow-sm'>
+      <Card style={{ height: 400, marginTop: 20 }} className='shadow-sm'>
         <Card.Header style={{ height: 60 }}>
           <Row>
             <Col xs={2}>
@@ -37,7 +37,7 @@ export default function ProductCard({ product }: Props) {
         </Card.Header>
         <Card.Img
           variant='top'
-          style={{ height: 250, width: 250, backgroundColor: '#d5f3fe' }}
+          style={{ height: 200, width: 200, backgroundColor: '#d5f3fe' }}
           className='d-flex, mx-auto'
           src={product.pictureUrl}
           alt={product.name}

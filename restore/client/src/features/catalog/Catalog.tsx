@@ -24,7 +24,6 @@ function Catalog() {
   const products = useAppSelector(productSelectors.selectAll);
   const {
     productsLoaded,
-    status,
     filtersLoaded,
     brands,
     types,
@@ -41,8 +40,7 @@ function Catalog() {
     if (!filtersLoaded) dispatch(fetchFiltersAsync());
   }, [dispatch, filtersLoaded]);
 
-  if (status.includes('pending') || !metaData)
-    return <LoadingComponent message='Loading products...' />;
+  if (!filtersLoaded) return <LoadingComponent message='Loading products...' />;
 
   return (
     <div className='row'>
@@ -80,12 +78,14 @@ function Catalog() {
       </div>
       <div className='col-9'>
         <ProductList products={products} />
-        <AppPagination
-          metaData={metaData}
-          onPageChange={(page: number) =>
-            dispatch(setPageNumber({ pageNumber: page }))
-          }
-        />
+        {metaData && (
+          <AppPagination
+            metaData={metaData}
+            onPageChange={(page: number) =>
+              dispatch(setPageNumber({ pageNumber: page }))
+            }
+          />
+        )}
       </div>
     </div>
   );
