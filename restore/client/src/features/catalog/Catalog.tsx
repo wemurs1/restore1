@@ -6,10 +6,13 @@ import {
   fetchFiltersAsync,
   fetchProductsAsync,
   productSelectors,
+  setProductParams,
 } from './catalogSlice';
 import { Form } from 'react-bootstrap';
 import ReactPaginate from 'react-paginate';
 import ProductSearch from './ProductSearch';
+import RadioButtonGroup from '../../app/components/RadioButtonGroup';
+import CheckboxButtons from '../../app/components/CheckboxButtons';
 
 const sortOptions = [
   { value: 'name', label: 'Alphabetical' },
@@ -19,12 +22,15 @@ const sortOptions = [
 
 function Catalog() {
   const products = useAppSelector(productSelectors.selectAll);
-  const { productsLoaded, status, filtersLoaded, brands, types } =
-    useAppSelector((state) => state.catalog);
+  const {
+    productsLoaded,
+    status,
+    filtersLoaded,
+    brands,
+    types,
+    productParams,
+  } = useAppSelector((state) => state.catalog);
   const dispatch = useAppDispatch();
-  const [sortOptionSelected, setSortOptionSelected] = useState(
-    sortOptions[0].value
-  );
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
@@ -34,10 +40,6 @@ function Catalog() {
   useEffect(() => {
     if (!filtersLoaded) dispatch(fetchFiltersAsync());
   }, [dispatch, filtersLoaded]);
-
-  function handleSortOptionSelectedChange(event: any) {
-    if (event.target.value) setSortOptionSelected(event.target.value);
-  }
 
   const handlePageClick = (event: any) => {
     console.log(event.selected);
@@ -51,53 +53,34 @@ function Catalog() {
     <div className='row'>
       <div className='col-3'>
         <div className='mb-3 mt-3' style={{ backgroundColor: 'white' }}>
-          <ProductSearch/>
+          <ProductSearch />
         </div>
         <div className='mb-3 p-2' style={{ backgroundColor: 'white' }}>
-          <Form.Group controlId='formSortSelect'>
-            {sortOptions.map(({ value, label }, index) => {
-              return (
-                <Form.Check
-                  key={index}
-                  type='radio'
-                  value={value}
-                  label={label}
-                  onChange={handleSortOptionSelectedChange}
-                  checked={sortOptionSelected === value}
-                />
-              );
-            })}
-          </Form.Group>
+          <RadioButtonGroup
+            options={sortOptions}
+            selectedValue={productParams.orderBy}
+            onChange={(event) =>
+              dispatch(setProductParams({ orderBy: event.target.value }))
+            }
+          />
         </div>
         <div className='mb-3 p-2' style={{ backgroundColor: 'white' }}>
-          <Form.Group controlId='formSortSelect'>
-            {brands.map((brand, index) => {
-              return (
-                <Form.Check
-                  key={index}
-                  type='checkbox'
-                  value={brand}
-                  label={brand}
-                  onChange={handleSortOptionSelectedChange}
-                />
-              );
-            })}
-          </Form.Group>
+          <CheckboxButtons
+            items={brands}
+            checked={productParams.brands}
+            onChange={(items: string[]) => {
+              dispatch(setProductParams({ brands: items }));
+            }}
+          />
         </div>
         <div className='mb-3 p-2' style={{ backgroundColor: 'white' }}>
-          <Form.Group controlId='formSortSelect'>
-            {types.map((type, index) => {
-              return (
-                <Form.Check
-                  key={index}
-                  type='checkbox'
-                  value={type}
-                  label={type}
-                  onChange={handleSortOptionSelectedChange}
-                />
-              );
-            })}
-          </Form.Group>
+          <CheckboxButtons
+            items={types}
+            checked={productParams.types}
+            onChange={(items: string[]) => {
+              dispatch(setProductParams({ types: items }));
+            }}
+          />
         </div>
       </div>
       <div className='col-9'>
