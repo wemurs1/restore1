@@ -2,17 +2,19 @@ import { useState } from 'react';
 import './../../app/layout/auth.css';
 import * as FaIcon from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import agent from '../../app/api/agent';
 
 export default function Login() {
   const [loginForm, setLoginForm] = useState({ userName: '', password: '' });
 
   function handleSubmit(event: any) {
     event.preventDefault();
-    console.log(loginForm);
+    agent.Account.login(loginForm);
   }
 
   function handleInputChange(event: any) {
-    setLoginForm({ ...loginForm, [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    setLoginForm({ ...loginForm, [name]: value });
   }
 
   return (
@@ -51,9 +53,7 @@ export default function Login() {
             </button>
           </div>
           <div className='text-end mt-2'>
-            <Link to='/register'>
-              Don't have an account? Sign Up
-            </Link>
+            <Link to='/register'>Don't have an account? Sign Up</Link>
           </div>
         </div>
       </form>
