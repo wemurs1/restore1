@@ -3,6 +3,7 @@ import { User } from "../../app/models/user";
 import { FieldValues } from "react-hook-form";
 import agent from "../../app/api/agent";
 import { router } from "../../app/router/Routes";
+import { toast } from "react-toastify";
 
 interface AccountState {
     user: User | null;
@@ -28,12 +29,18 @@ export const signInUserAsync = createAsyncThunk<User, FieldValues>(
 export const fetchCurrentUserAsync = createAsyncThunk<User>(
     'account/fetchCurrentUser',
     async (_, thunkApi) => {
+        thunkApi.dispatch(setUser(JSON.parse(localStorage.getItem('user')!)));
         try {
             const user = await agent.Account.currentUser();
             localStorage.setItem('user', JSON.stringify(user));
             return user;
         } catch (error: any) {
             return thunkApi.rejectWithValue({ error: error.data })
+        }
+    },
+    {
+        condition: () => {
+            if (!localStorage.getItem('user')) return false;
         }
     }
 );
@@ -46,16 +53,26 @@ export const accountSlice = createSlice({
             state.user = null;
             localStorage.removeItem('user');
             router.navigate('/');
+        },
+        setUser: (state, action) => {
+            state.user = action.payload
         }
     },
     extraReducers: (builder => {
+        builder.addCase(signInUserAsync.rejected, (state, action) => {
+            console.log(action.payload);
+        });
+        builder.addCase(fetchCurrentUserAsync.rejected, (state) => {
+            console.log(state.user);
+            state.user = null;
+            localStorage.removeItem('user');
+            toast.error('Session expired - please login again');
+            router.navigate('/');
+        })
         builder.addMatcher(isAnyOf(signInUserAsync.fulfilled, fetchCurrentUserAsync.fulfilled), (state, action) => {
             state.user = action.payload;
         });
-        builder.addMatcher(isAnyOf(signInUserAsync.rejected, fetchCurrentUserAsync.rejected), (state, action) => {
-            console.log(action.payload);
-        })
     })
 });
 
-export const { signOut } = accountSlice.actions;
+export const { signOut, setUser } = accountSlice.actions;

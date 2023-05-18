@@ -9,12 +9,14 @@ import agent from '../api/agent';
 import LoadingComponent from './LoadingComponent';
 import { useAppDispatch } from '../store/configureStore';
 import { setBasket } from '../../features/basket/basketSlice';
+import { fetchCurrentUserAsync } from '../../features/account/accountSlice';
 
 export default function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    dispatch(fetchCurrentUserAsync());
     const buyerId = getCookie('buyerId');
     if (buyerId) {
       agent.Basket.get()
