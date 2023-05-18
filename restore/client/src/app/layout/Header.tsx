@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 import * as FaIcon from 'react-icons/fa';
 import { useAppSelector } from '../store/configureStore';
+import SignedInMenu from './SignedInMenu';
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -21,6 +22,7 @@ interface Props {
 
 function Header({ darkMode, onChange }: Props) {
   const { basket } = useAppSelector((state) => state.basket);
+  const { user } = useAppSelector((state) => state.account);
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
@@ -90,21 +92,27 @@ function Header({ darkMode, onChange }: Props) {
             </Button>
           </NavLink>
         </li>
-        {rightLinks.map(({ title, path }) => (
-          <li key={path}>
-            <NavLink
-              style={{
-                color: 'white',
-                textDecoration: 'none',
-                verticalAlign: 'bottom',
-              }}
-              className={'me-3 h6'}
-              to={path}
-            >
-              {title.toUpperCase()}
-            </NavLink>
-          </li>
-        ))}
+        {user ? (
+          <SignedInMenu />
+        ) : (
+          <>
+            {rightLinks.map(({ title, path }) => (
+              <li key={path}>
+                <NavLink
+                  style={{
+                    color: 'white',
+                    textDecoration: 'none',
+                    verticalAlign: 'bottom',
+                  }}
+                  className={'me-3 h6'}
+                  to={path}
+                >
+                  {title.toUpperCase()}
+                </NavLink>
+              </li>
+            ))}
+          </>
+        )}
       </ul>
     </header>
   );

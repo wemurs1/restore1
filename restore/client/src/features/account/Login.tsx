@@ -1,25 +1,30 @@
-import { useState } from 'react';
 import './../../app/layout/auth.css';
 import * as FaIcon from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-import agent from '../../app/api/agent';
+import { Link, useNavigate } from 'react-router-dom';
+import { FieldValues, useForm } from 'react-hook-form';
+import { Spinner } from 'react-bootstrap';
+import { useAppDispatch } from '../../app/store/configureStore';
+import { signInUserAsync } from './accountSlice';
 
 export default function Login() {
-  const [loginForm, setLoginForm] = useState({ userName: '', password: '' });
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, isValid, errors },
+  } = useForm({
+    mode: 'onTouched',
+  });
 
-  function handleSubmit(event: any) {
-    event.preventDefault();
-    agent.Account.login(loginForm);
-  }
-
-  function handleInputChange(event: any) {
-    const { name, value } = event.target;
-    setLoginForm({ ...loginForm, [name]: value });
+  async function submitForm(data: FieldValues) {
+    await dispatch(signInUserAsync(data));
+    navigate('/catalog');
   }
 
   return (
     <div className='Auth-form-container'>
-      <form className='Auth-form' onSubmit={handleSubmit}>
+      <form className='Auth-form' onSubmit={handleSubmit(submitForm)}>
         <div className='Auth-form-content'>
           <h3 className='Auth-form-icon'>
             <FaIcon.FaLock />
@@ -29,26 +34,45 @@ export default function Login() {
             <label>User name</label>
             <input
               type='text'
-              name='userName'
-              className='form-control mt-1'
+              {...register('username', { required: 'Username is required' })}
+              className={`form-control mt-1 ${
+                errors.username ? 'is-invalid' : ''
+              }`}
               placeholder='Enter Username'
-              value={loginForm.userName}
-              onChange={handleInputChange}
             />
+            <div className='invalid-feedback'>
+              {errors.username?.message as string}
+            </div>
           </div>
           <div className='form-group mt-3'>
             <label>Password</label>
             <input
               type='password'
-              name='password'
-              className='form-control mt-1'
               placeholder='Enter password'
-              value={loginForm.password}
-              onChange={handleInputChange}
+              {...register('password', { required: 'Password is required' })}
+              className={`form-control mt-1 ${
+                errors.username ? 'is-invalid' : ''
+              }`}
             />
+            <div className='invalid-feedback'>
+              {errors.password?.message as string}
+            </div>
           </div>
           <div className='d-grid gap-2 mt-3'>
-            <button type='submit' className='btn btn-primary'>
+            <button
+              type='submit'
+              className='btn btn-primary'
+              disabled={!isValid}
+            >
+              {isSubmitting && (
+                <Spinner
+                  as='span'
+                  animation='border'
+                  size='sm'
+                  role='status'
+                  aria-hidden='true'
+                />
+              )}
               Submit
             </button>
           </div>
