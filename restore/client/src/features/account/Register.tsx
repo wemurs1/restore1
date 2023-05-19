@@ -1,29 +1,47 @@
 import './../../app/layout/auth.css';
 import * as FaIcon from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Alert, ListGroup, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import agent from '../../app/api/agent';
-import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export default function Register() {
-  const [validationErrors, setValidationErrors] = useState([]);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
+    setError,
     formState: { isSubmitting, isValid, errors },
   } = useForm({
     mode: 'onTouched',
   });
+
+  function handleApiErrors(errors: any) {
+    if (errors) {
+      errors.forEach((error: string) => {
+        if (error.includes('Password')) {
+          setError('password', { message: error });
+        } else if (error.includes('Email')) {
+          setError('email', { message: error });
+        } else if (error.includes('Username')) {
+          setError('username', { message: error });
+        }
+      });
+    }
+  }
 
   return (
     <div className='Auth-form-container'>
       <form
         className='Auth-form'
         onSubmit={handleSubmit((data) =>
-          agent.Account.register(data).catch((error) =>
-            setValidationErrors(error)
-          )
+          agent.Account.register(data)
+            .then(() => {
+              toast.success('Registration successful - you can now login');
+              navigate('/login');
+            })
+            .catch((error) => handleApiErrors(error))
         )}
       >
         <div className='Auth-form-content'>
@@ -50,7 +68,14 @@ export default function Register() {
             <label>Email Address</label>
             <input
               type='text'
-              {...register('email', { required: 'Email is required' })}
+              {...register('email', {
+                required: 'Email is required',
+                pattern: {
+                  // eslint-disable-next-line no-useless-escape
+                  value: /^\w+[\w-\.]*\@\w+((-\w+)|(\w*))\.[a-z]{2,3}$/,
+                  message: 'Not a valid email address',
+                },
+              })}
               className={`form-control mt-1 ${
                 errors.email ? 'is-invalid' : ''
               }`}
@@ -65,7 +90,13 @@ export default function Register() {
             <input
               type='password'
               placeholder='Enter password'
-              {...register('password', { required: 'Password is required' })}
+              {...register('password', {
+                required: 'Password is required',
+                pattern: {
+                  value: /(?=^.{6,10}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&amp;*()_+}{&quot;:;'?/&gt;.&lt;,])(?!.*\s).*$/,
+                  message: 'Password does not meet complexity requirements',
+                },
+              })}
               className={`form-control mt-1 ${
                 errors.username ? 'is-invalid' : ''
               }`}
@@ -74,21 +105,6 @@ export default function Register() {
               {errors.password?.message as string}
             </div>
           </div>
-          {validationErrors.length > 0 && (
-            <Alert variant='error'>
-              <Alert.Heading className='text-danger'>
-                Validation Errors
-              </Alert.Heading>
-              <ListGroup>
-                {validationErrors.map((error) => (
-                  <ListGroup.Item key={error} className='text-danger'>
-                    {error}
-                  </ListGroup.Item>
-                ))}
-              </ListGroup>
-            </Alert>
-          )}
-
           <div className='d-grid gap-2 mt-3'>
             <button
               type='submit'
