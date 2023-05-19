@@ -34,6 +34,7 @@ export default function Login() {
             <label>User name</label>
             <input
               type='text'
+              autoFocus
               {...register('username', { required: 'Username is required' })}
               className={`form-control mt-1 ${
                 errors.username ? 'is-invalid' : ''
