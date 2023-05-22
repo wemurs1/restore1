@@ -1,6 +1,6 @@
 import './../../app/layout/auth.css';
 import * as FaIcon from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FieldValues, useForm } from 'react-hook-form';
 import { Spinner } from 'react-bootstrap';
 import { useAppDispatch } from '../../app/store/configureStore';
@@ -8,6 +8,7 @@ import { signInUserAsync } from './accountSlice';
 
 export default function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const {
     register,
@@ -20,7 +21,7 @@ export default function Login() {
   async function submitForm(data: FieldValues) {
     try {
       await dispatch(signInUserAsync(data));
-      navigate('/catalog');
+      navigate(location.state?.from || '/catalog');
     } catch (error: any) {
       console.log(error);
     }
