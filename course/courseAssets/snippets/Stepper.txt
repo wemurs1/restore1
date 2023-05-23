@@ -1,0 +1,53 @@
+import React, { useState } from 'react';
+import { Stepper } from 'react-form-stepper';
+import './App.css';
+
+function UserDetails() {
+  return <h2>User details</h2>;
+}
+
+function Payment() {
+  return <h2>Payment information</h2>;
+}
+
+function Confirmation() {
+  return <h2>Booking is confirmed</h2>;
+}
+
+function App() {
+  const [ activeStep, setActiveStep ] = useState(0);
+
+  const steps = [
+    { label: 'User details' },
+    { label: 'Payment' },
+    { label: 'Booking confirmation' },
+  ];
+
+  function getSectionComponent() {
+    switch(activeStep) {
+      case 0: return <UserDetails/>;
+      case 1: return <Payment/>;
+      case 2: return <Confirmation/>;
+      default: return null;
+    }
+  }
+
+  return (
+    <div>
+      <Stepper
+        steps={steps}
+        activeStep={activeStep}/>
+      <div style={{padding: '20px'}}>
+        { getSectionComponent()  }
+        { (activeStep !== 0 && activeStep !== steps.length - 1)
+            && <button onClick={ () => setActiveStep(activeStep - 1) }>Previous</button>
+        }
+        { activeStep !== steps.length - 1
+          && <button onClick={ () => setActiveStep(activeStep + 1) }>Next</button>
+        }
+      </div>
+    </div>
+  );
+}
+
+export default App;

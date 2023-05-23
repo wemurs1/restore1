@@ -20,21 +20,24 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Order>>> GetOrders()
+        public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
             return await _context.Orders
-                .Include(o => o.Orderitems)
+                .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity!.Name)
                 .ToListAsync();
         }
 
         [HttpGet("{id}", Name = "GetOrder")]
-        public async Task<ActionResult<Order?>> GetOrder(int id)
+        public async Task<ActionResult<OrderDto?>> GetOrder(int id)
         {
-            return await _context.Orders
-                .Include(o => o.Orderitems)
+            var order = await _context.Orders
+                .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity!.Name && x.Id == id)
                 .FirstOrDefaultAsync();
+            if (order == null) return NotFound();
+
+            return order;
         }
 
         [HttpPost]
@@ -67,7 +70,7 @@ namespace API.Controllers
             }
 
             var subTotal = items.Sum(item => item.Price * item.Quantity);
-            var deliveryFee = subTotal > 100000 ? 0 : 500;
+            var deliveryFee = subTotal > 10000 ? 0 : 500;
 
             var order = new Order
             {
