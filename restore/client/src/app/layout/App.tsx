@@ -1,15 +1,22 @@
+import {
+  Container,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+} from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import { Container } from 'react-bootstrap';
-import { Outlet } from 'react-router-dom';
-import Header from './Header';
+import { Outlet, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
+import Header from './Header';
 import 'react-toastify/dist/ReactToastify.css';
 import LoadingComponent from './LoadingComponent';
 import { useAppDispatch } from '../store/configureStore';
 import { fetchBasketAsync } from '../../features/basket/basketSlice';
 import { fetchCurrentUserAsync } from '../../features/account/accountSlice';
+import HomePage from '../../features/home/HomePage';
 
-export default function App() {
+function App() {
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
 
@@ -27,21 +34,36 @@ export default function App() {
   }, [initApp]);
 
   const [darkMode, setDarkMode] = useState(false);
+  const palleteType = darkMode ? 'dark' : 'light';
+  const theme = createTheme({
+    palette: {
+      mode: palleteType,
+      background: {
+        default: palleteType === 'light' ? '#eaeaea' : '#121212',
+      },
+    },
+  });
 
-  const onChange = () => {
+  function handleThemeChange() {
     setDarkMode(!darkMode);
-    console.log(`darkMode=${darkMode}. Magic would happen here`);
-  };
-
-  if (loading) return <LoadingComponent message='Initialising app...' />;
+  }
 
   return (
-    <div style={{ backgroundColor: '#eaeaea', height: '100vh' }}>
+    <ThemeProvider theme={theme}>
       <ToastContainer position='bottom-right' hideProgressBar theme='colored' />
-      <Header darkMode={darkMode} onChange={onChange} />
-      <Container style={{ marginTop: '95px' }}>
-        <Outlet />
-      </Container>
-    </div>
+      <CssBaseline />
+      <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
+      {loading ? (
+        <LoadingComponent message='Initialising app...' />
+      ) : location.pathname === '/' ? (
+        <HomePage />
+      ) : (
+        <Container sx={{ mt: 4 }}>
+          <Outlet />
+        </Container>
+      )}
+    </ThemeProvider>
   );
 }
+
+export default App;

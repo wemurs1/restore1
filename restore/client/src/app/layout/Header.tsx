@@ -1,6 +1,16 @@
-import { Button } from 'react-bootstrap';
-import { NavLink } from 'react-router-dom';
-import * as FaIcon from 'react-icons/fa';
+import { ShoppingCart } from '@mui/icons-material';
+import {
+  AppBar,
+  Badge,
+  IconButton,
+  List,
+  ListItem,
+  Switch,
+  Toolbar,
+  Typography,
+} from '@mui/material';
+import { Box } from '@mui/system';
+import { Link, NavLink } from 'react-router-dom';
 import { useAppSelector } from '../store/configureStore';
 import SignedInMenu from './SignedInMenu';
 
@@ -15,107 +25,89 @@ const rightLinks = [
   { title: 'register', path: '/register' },
 ];
 
+const navStyles = {
+  color: 'inherit',
+  textDecoration: 'none',
+  typography: 'h6',
+  '&:hover': {
+    color: 'grey.500',
+  },
+  '&.active': {
+    color: 'text.secondary',
+  },
+};
+
 interface Props {
   darkMode: boolean;
-  onChange: () => void;
+  handleThemeChange: () => void;
 }
 
-function Header({ darkMode, onChange }: Props) {
+export default function Header({ handleThemeChange, darkMode }: Props) {
   const { basket } = useAppSelector((state) => state.basket);
   const { user } = useAppSelector((state) => state.account);
   const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header
-      className='d-flex flex-row align-items-center justify-content-between p-3 px-4 mb-3 
-    bg-primary border-bottom fixed-top shadow-sm'
-    >
-      <div className='row'>
-        <div className='col-8 mt-0'>
-          <NavLink to='/'>
-            <div style={{ color: 'white', textDecoration: 'none' }}>
-              RE-STORE
-            </div>
-          </NavLink>
-        </div>
-        <div className='col-4'>
-          <div className='form-check form-switch'>
-            <input
-              className='form-check-input bg-secondary my-0'
-              type='checkbox'
-              role='switch'
-              id='flexSwitchCheckDefault'
-              checked={!darkMode}
-              onChange={onChange}
-            />
-          </div>
-        </div>
-      </div>
-
-      <ul
-        style={{
+    <AppBar position='static'>
+      <Toolbar
+        sx={{
           display: 'flex',
-          listStyle: 'none',
-          verticalAlign: 'center',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
-        {midLinks.map(({ title, path }) => (
-          <li key={path}>
-            <NavLink
-              style={{ color: 'white', textDecoration: 'none' }}
-              className={'me-3 h6'}
-              to={path}
-            >
+        <Box display='flex' alignItems='center'>
+          <Typography variant='h6' component={NavLink} to='/' sx={navStyles}>
+            RE-STORE
+          </Typography>
+          <Switch checked={darkMode} onChange={handleThemeChange} />
+        </Box>
+
+        <List sx={{ display: 'flex' }}>
+          {midLinks.map(({ title, path }) => (
+            <ListItem component={NavLink} to={path} key={path} sx={navStyles}>
               {title.toUpperCase()}
-            </NavLink>
-          </li>
-        ))}
-      </ul>
+            </ListItem>
+          ))}
+          {/* {user && user.roles?.includes('Admin') && (
+            <ListItem component={NavLink} to={'/inventory'} sx={navStyles}>
+              INVENTORY
+            </ListItem>
+          )} */}
+        </List>
 
-      <ul
-        style={{
-          display: 'flex',
-          listStyle: 'none',
-          verticalAlign: 'center',
-        }}
-      >
-        <li>
-          <NavLink to='/basket'>
-            <Button size='lg' style={{ position: 'relative' }}>
-              <FaIcon.FaShoppingCart style={{ color: 'white' }} />
-              <div
-                className='cart-no'
-                style={{ color: 'blue', fontSize: 'small' }}
-              >
-                {itemCount}
-              </div>
-            </Button>
-          </NavLink>
-        </li>
-        {user ? (
-          <SignedInMenu />
-        ) : (
-          <>
-            {rightLinks.map(({ title, path }) => (
-              <li key={path}>
-                <NavLink
-                  style={{
-                    color: 'white',
-                    textDecoration: 'none',
-                    verticalAlign: 'bottom',
-                  }}
-                  className={'me-3 h6'}
+        <Box display='flex' alignItems='center'>
+          <IconButton
+            component={Link}
+            to='/basket'
+            size='large'
+            edge='start'
+            color='inherit'
+            sx={{ mr: 2 }}
+          >
+            <Badge badgeContent={itemCount} color='secondary'>
+              <ShoppingCart />
+            </Badge>
+          </IconButton>
+
+          {user ? (
+            <SignedInMenu />
+          ) : (
+            <List sx={{ display: 'flex' }}>
+              {rightLinks.map(({ title, path }) => (
+                <ListItem
+                  component={NavLink}
                   to={path}
+                  key={path}
+                  sx={navStyles}
                 >
                   {title.toUpperCase()}
-                </NavLink>
-              </li>
-            ))}
-          </>
-        )}
-      </ul>
-    </header>
+                </ListItem>
+              ))}
+            </List>
+          )}
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
-
-export default Header;

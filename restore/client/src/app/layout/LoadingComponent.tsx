@@ -1,14 +1,26 @@
+import { Backdrop, Box, CircularProgress, Typography } from '@mui/material';
+
 interface Props {
   message?: string;
 }
 
 export default function LoadingComponent({ message = 'Loading...' }: Props) {
   return (
-    <div className='d-flex flex-column min-vh-100 justify-content-center align-items-center'>
-      <div className='text-center'>
-        <div className='spinner-border' role='status'></div>
-        <div>{message}</div>
-      </div>
-    </div>
+    <Backdrop open={true} invisible={true}>
+      <Box
+        alignItems='center'
+        display='flex'
+        justifyContent='center'
+        height='100vh'
+      >
+        <CircularProgress size={100} color='secondary' />
+        <Typography
+          variant='h4'
+          sx={{ justifyContent: 'center', position: 'fixed', top: '60%' }}
+        >
+          {message}
+        </Typography>
+      </Box>
+    </Backdrop>
   );
 }
