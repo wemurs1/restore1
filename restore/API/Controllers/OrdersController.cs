@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Entities.OrderAggregate;
 using API.Extensions;
+using API.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,15 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<OrderDto>>> GetOrders()
+        public async Task<ActionResult<PagedList<OrderDto>>> GetOrders([FromQuery] OrderParams orderParams)
         {
-            return await _context.Orders
+            var query = _context.Orders
                 .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity!.Name)
-                .ToListAsync();
+                .AsQueryable();
+            var orders = await PagedList<OrderDto>.ToPagedList(query, orderParams.PageNumber, orderParams.PageSize);
+            Response.AddPaginationheader(orders.MetaData);
+            return orders;
         }
 
         [HttpGet("{id}", Name = "GetOrder")]

@@ -15,9 +15,10 @@ import { FieldValues, FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { validationSchema } from './checkoutValidation';
 import agent from '../../app/api/agent';
-import { useAppDispatch } from '../../app/store/configureStore';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
 import { clearBasket } from '../basket/basketSlice';
 import { LoadingButton } from '@mui/lab';
+import { createOrderAsync } from '../orders/orderSlice';
 
 const steps = ['Shipping address', 'Review your order', 'Payment details'];
 
@@ -36,9 +37,8 @@ function getStepContent(step: number) {
 
 export default function CheckoutPage() {
   const [activeStep, setActiveStep] = useState(0);
-  const [orderNumber, setOrderNumber] = useState(0);
-  const [loading, setLoading] = useState(false);
   const dispatch = useAppDispatch();
+  const { orderNumber, status } = useAppSelector((state) => state.order);
 
   const currentValidationSchema = validationSchema[activeStep];
 
@@ -63,19 +63,13 @@ export default function CheckoutPage() {
     const { nameOnCard, saveAddress, ...shippingAddress } = data;
 
     if (activeStep === steps.length - 1) {
-      setLoading(true);
+      const orderDto = { saveAddress, shippingAddress };
       try {
-        const orderNumber = await agent.Orders.create({
-          saveAddress,
-          shippingAddress,
-        });
-        setOrderNumber(orderNumber);
+        dispatch(createOrderAsync(orderDto));
         setActiveStep(activeStep + 1);
         dispatch(clearBasket());
-        setLoading(false);
       } catch (error: any) {
         console.log(error);
-        setLoading(false);
       }
     } else {
       setActiveStep(activeStep + 1);
@@ -124,7 +118,7 @@ export default function CheckoutPage() {
                   </Button>
                 )}
                 <LoadingButton
-                  loading={loading}
+                  loading={status.includes('pending')}
                   disabled={!methods.formState.isValid}
                   variant='contained'
                   type='submit'

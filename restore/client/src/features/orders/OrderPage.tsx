@@ -8,24 +8,22 @@ import {
   Table,
   Button,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { Order } from '../../app/models/order';
-import agent from '../../app/api/agent';
+import { useEffect } from 'react';
 import LoadingComponent from '../../app/layout/LoadingComponent';
 import { currencyFormat } from '../../app/util/util';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { fetchOrdersAsync, orderSelectors } from './orderSlice';
 
 export default function OrderPage() {
-  const [orders, setOrders] = useState<Order[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const orders = useAppSelector(orderSelectors.selectAll);
+  const { ordersLoaded, metaData } = useAppSelector((state) => state.order);
 
   useEffect(() => {
-    agent.Orders.list()
-      .then((orders) => setOrders(orders))
-      .catch((error) => console.log(error))
-      .finally(() => setLoading(false));
-  }, []);
+    if (!ordersLoaded) dispatch(fetchOrdersAsync());
+  }, [dispatch, ordersLoaded]);
 
-  if (loading) return <LoadingComponent message='Loading orders...' />;
+  if (!ordersLoaded) return <LoadingComponent message='Loading orders...' />;
 
   return (
     <TableContainer component={Paper}>

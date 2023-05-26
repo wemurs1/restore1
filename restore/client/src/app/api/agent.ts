@@ -84,7 +84,7 @@ const Account = {
 }
 
 const Orders = {
-  list: () => requests.get('orders'),
+  list: (params: URLSearchParams) => requests.get('orders', params),
   fetch: (id: number) => requests.get(`orders/${id}`),
   create: (values: any) => requests.post('orders', values)
 }

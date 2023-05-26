@@ -27,3 +27,8 @@ export interface Order {
     orderStatus: string;
     total: number;
 }
+
+export interface OrderParams {
+    pageNumber: number;
+    pageSize: number;
+  }
