@@ -3,6 +3,7 @@ using API.DTOs;
 using API.Entities;
 using API.Entities.OrderAggregate;
 using API.Extensions;
+using API.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,24 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<OrderDto>>> GetOrders()
+        public async Task<ActionResult<PagedList<OrderDto>>> GetOrders([FromQuery] OrderParams orderParams)
         {
-            return await _context.Orders
+            var query = _context.Orders
                 .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity!.Name)
-                .ToListAsync();
+                .AsQueryable();
+            var orders = await PagedList<OrderDto>.ToPagedList(query, orderParams.PageNumber, orderParams.PageSize);
+            Response.AddPaginationheader(orders.MetaData);
+            return orders;
+        }
+
+        [HttpGet("getMetaData")]
+        public async Task<ActionResult<MetaData>> GetMetaData([FromQuery] OrderParams orderParams)
+        {
+            var query = _context.Orders.Where(x => x.BuyerId == User.Identity!.Name).AsQueryable();
+            var metaData = await PagedList<Order>.RefreshMetaData(query, orderParams.PageNumber, orderParams.PageSize);
+            Response.AddPaginationheader(metaData);
+            return metaData;
         }
 
         [HttpGet("{id}", Name = "GetOrder")]
@@ -86,9 +99,11 @@ namespace API.Controllers
 
             if (orderDto.SaveAddress)
             {
-                var user = await _context.Users.FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
+                var user = await _context.Users
+                    .Include(a => a.Address)
+                    .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
                 if (user == null) return BadRequest(new ProblemDetails { Title = "Can't find user record" });
-                user.Address = new UserAddress
+                var address = new UserAddress
                 {
                     FullName = orderDto.ShippingAddress!.FullName,
                     Address1 = orderDto.ShippingAddress.Address1,
@@ -98,7 +113,7 @@ namespace API.Controllers
                     Zip = orderDto.ShippingAddress.Zip,
                     Country = orderDto.ShippingAddress.Country
                 };
-                _context.Update(user);
+                user.Address = address;
             }
 
             var result = await _context.SaveChangesAsync() > 0;
