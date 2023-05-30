@@ -6,18 +6,18 @@ import {
   TableRow,
   TableCell,
 } from '@mui/material';
-import { useAppSelector } from '../../app/store/configureStore';
 import { currencyFormat } from '../../app/util/util';
+import { BasketItem } from '../../app/models/basket';
 
 interface Props {
   subtotal?: number;
+  basketItems: BasketItem[];
 }
 
-export default function BasketSummary({ subtotal }: Props) {
-  const { basket } = useAppSelector((state) => state.basket);
+export default function BasketSummary({ subtotal, basketItems }: Props) {
   if (subtotal === undefined)
     subtotal =
-      basket?.items.reduce(
+      basketItems.reduce(
         (sum, item) => sum + item.quantity * item.price,
         0
       ) ?? 0;

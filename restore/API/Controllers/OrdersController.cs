@@ -32,6 +32,15 @@ namespace API.Controllers
             return orders;
         }
 
+        [HttpGet("getMetaData")]
+        public async Task<ActionResult<MetaData>> GetMetaData([FromQuery] OrderParams orderParams)
+        {
+            var query = _context.Orders.Where(x => x.BuyerId == User.Identity!.Name).AsQueryable();
+            var metaData = await PagedList<Order>.RefreshMetaData(query, orderParams.PageNumber, orderParams.PageSize);
+            Response.AddPaginationheader(metaData);
+            return metaData;
+        }
+
         [HttpGet("{id}", Name = "GetOrder")]
         public async Task<ActionResult<OrderDto?>> GetOrder(int id)
         {

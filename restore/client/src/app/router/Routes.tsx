@@ -13,6 +13,7 @@ import Login from '../../features/account/Login';
 import Register from '../../features/account/Register';
 import RequireAuth from './RequireAuth';
 import OrderPage from '../../features/orders/OrderPage';
+import OrderDetailsPage from '../../features/orders/OrderDetailsPage';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'checkout', element: <CheckoutPage /> },
           { path: 'orders', element: <OrderPage /> },
+          { path: 'orders/:id', element: <OrderDetailsPage /> },
         ],
       },
       { path: '', element: <HomePage /> },

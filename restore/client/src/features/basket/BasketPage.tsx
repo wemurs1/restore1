@@ -16,7 +16,7 @@ export default function BasketPage() {
       <Grid container>
         <Grid item xs={6} />
         <Grid item xs={6}>
-          <BasketSummary />
+          <BasketSummary basketItems={basket.items} />
           <Button
             component={Link}
             to='/checkout'

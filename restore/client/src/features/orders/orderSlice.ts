@@ -55,12 +55,17 @@ export const fetchOrderAsync = createAsyncThunk<Order, number>(
     }
 );
 
-export const createOrderAsync = createAsyncThunk<number, any>(
+export const createOrderAsync = createAsyncThunk<number, any, { state: RootState }>(
     'order/createOrderAsync',
     async ({ saveAddress, shippingAddress }, thunkAPI) => {
         try {
             const orderNumber = await agent.Orders.create({ saveAddress, shippingAddress });
-            if (orderNumber) thunkAPI.dispatch(fetchOrderAsync(orderNumber));
+            if (orderNumber) {
+                const params = getAxiosParams(thunkAPI.getState().order.orderParams);
+                const response = await agent.Orders.refreshMetaData(params);
+                thunkAPI.dispatch(setOrderMetaData(response.metaData));
+
+            }
             return orderNumber;
         } catch (error: any) {
             return thunkAPI.rejectWithValue({ error: error.data })
