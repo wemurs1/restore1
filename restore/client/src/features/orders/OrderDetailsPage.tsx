@@ -1,70 +1,44 @@
-import { Typography, Grid, Box, Button } from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
+import { Box, Typography, Button, Grid } from '@mui/material';
+import { BasketItem } from '../../app/models/basket';
+import { Order } from '../../app/models/order';
 import BasketSummary from '../basket/BasketSummary';
 import BasketTable from '../basket/BasketTable';
-import { fetchOrderAsync, orderSelectors } from './orderSlice';
-import { useNavigate, useParams } from 'react-router-dom';
-import { BasketItem } from '../../app/models/basket';
-import { useEffect } from 'react';
 
-export default function OrderDetailsPage() {
-  const { id } = useParams<{ id: string }>();
-  const dispatch = useAppDispatch();
-  const navigate = useNavigate();
-  const order = useAppSelector((state) =>
-    orderSelectors.selectById(state, id!)
-  );
+interface Props {
+  order: Order;
+  setSelectedOrder: (id: number) => void;
+}
 
-  useEffect(() => {
-    if (!order) dispatch(fetchOrderAsync(parseInt(id!)));
-  }, [id, dispatch, order]);
+export default function OrderDetailsPage({ order, setSelectedOrder }: Props) {
+  console.log(order);
 
-  if (!order)
-    return (
-      <Box display='flex' justifyContent='space-between'>
-        <Typography sx={{ p: 2 }} variant='h4' gutterBottom>
-          No Order Found
-        </Typography>
-        <Button
-          onClick={() => navigate('/orders')}
-          sx={{ m: 2 }}
-          size='large'
-          variant='contained'
-        >
-          Return to orders
-        </Button>
-      </Box>
-    );
-
+  const subtotal =
+    order.orderItems.reduce(
+      (sum, item) => sum + item.quantity * item.price,
+      0
+    ) ?? 0;
   return (
     <>
       <Box display='flex' justifyContent='space-between'>
-        <Typography sx={{ p: 2 }} variant='h4' gutterBottom>
-          Order# {order?.id} - {order?.orderStatus}
+        <Typography sx={{ p: 2 }} gutterBottom variant='h4'>
+          Order# {order.id} - {order.orderStatus}
         </Typography>
         <Button
-          onClick={() => navigate('/orders')}
+          onClick={() => setSelectedOrder(0)}
           sx={{ m: 2 }}
           size='large'
           variant='contained'
         >
-          Return to orders
+          Back to orders
         </Button>
       </Box>
-      {order && (
-        <>
-          <BasketTable
-            items={order.orderitems as BasketItem[]}
-            isBasket={false}
-          />
-          <Grid container>
-            <Grid item xs={6} />
-            <Grid item xs={6}>
-              <BasketSummary basketItems={order.orderitems as BasketItem[]} />
-            </Grid>
-          </Grid>
-        </>
-      )}
+      <BasketTable items={order.orderItems as BasketItem[]} isBasket={false} />
+      <Grid container>
+        <Grid item xs={6} />
+        <Grid item xs={6}>
+          <BasketSummary subtotal={subtotal} />
+        </Grid>
+      </Grid>
     </>
   );
 }

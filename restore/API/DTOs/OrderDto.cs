@@ -8,7 +8,7 @@ namespace API.DTOs
         public string? BuyerId { get; set; }
         public ShippingAddress? ShippingAddress { get; set; }
         public DateTime OrderDate { get; set; }
-        public List<OrderItemDto>? Orderitems { get; set; }
+        public List<OrderItemDto>? OrderItems { get; set; }
         public long SubTotal { get; set; }
         public long DeliveryFee { get; set; }
         public string? OrderStatus { get; set; }

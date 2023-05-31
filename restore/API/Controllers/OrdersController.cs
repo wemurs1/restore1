@@ -3,7 +3,6 @@ using API.DTOs;
 using API.Entities;
 using API.Entities.OrderAggregate;
 using API.Extensions;
-using API.RequestHelpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -14,61 +13,51 @@ namespace API.Controllers
     public class OrdersController : BaseApiController
     {
         private readonly StoreContext _context;
+
         public OrdersController(StoreContext context)
         {
             _context = context;
-
         }
 
         [HttpGet]
-        public async Task<ActionResult<PagedList<OrderDto>>> GetOrders([FromQuery] OrderParams orderParams)
+        public async Task<ActionResult<List<OrderDto>>> GetOrders()
         {
-            var query = _context.Orders
+            var orders = await _context.Orders
                 .ProjectOrderToOrderDto()
                 .Where(x => x.BuyerId == User.Identity!.Name)
-                .AsQueryable();
-            var orders = await PagedList<OrderDto>.ToPagedList(query, orderParams.PageNumber, orderParams.PageSize);
-            Response.AddPaginationheader(orders.MetaData);
-            return orders;
-        }
+                .ToListAsync();
 
-        [HttpGet("getMetaData")]
-        public async Task<ActionResult<MetaData>> GetMetaData([FromQuery] OrderParams orderParams)
-        {
-            var query = _context.Orders.Where(x => x.BuyerId == User.Identity!.Name).AsQueryable();
-            var metaData = await PagedList<Order>.RefreshMetaData(query, orderParams.PageNumber, orderParams.PageSize);
-            Response.AddPaginationheader(metaData);
-            return metaData;
+            return orders;
         }
 
         [HttpGet("{id}", Name = "GetOrder")]
         public async Task<ActionResult<OrderDto?>> GetOrder(int id)
         {
-            var order = await _context.Orders
+            return await _context.Orders
                 .ProjectOrderToOrderDto()
-                .Where(x => x.BuyerId == User.Identity!.Name && x.Id == id)
-                .FirstOrDefaultAsync();
-            if (order == null) return NotFound();
-
-            return order;
+                .FirstOrDefaultAsync(x => x.BuyerId == User.Identity!.Name && x.Id == id);
         }
 
         [HttpPost]
         public async Task<ActionResult<int>> CreateOrder(CreateOrderDto orderDto)
         {
-            var basket = await _context.Baskets.RetrieveBasketWithItems(User.Identity!.Name!).FirstOrDefaultAsync();
+            var basket = await _context.Baskets
+                .RetrieveBasketWithItems(User.Identity!.Name!)
+                .FirstOrDefaultAsync();
 
-            if (basket == null) return BadRequest(new ProblemDetails { Title = "Could not locate basket" });
+            if (basket == null) return BadRequest(new ProblemDetails
+            {
+                Title = "Could not find basket"
+            });
 
             var items = new List<OrderItem>();
 
             foreach (var item in basket.Items)
             {
                 var productItem = await _context.Products.FindAsync(item.ProductId);
-                if (productItem == null) return BadRequest(new ProblemDetails { Title = "Product in basket not found" });
                 var itemOrdered = new ProductItemOrdered
                 {
-                    ProductId = productItem.Id,
+                    ProductId = productItem!.Id,
                     Name = productItem.Name,
                     PictureUrl = productItem.PictureUrl
                 };
@@ -82,15 +71,15 @@ namespace API.Controllers
                 productItem.QuantityInStock -= item.Quantity;
             }
 
-            var subTotal = items.Sum(item => item.Price * item.Quantity);
-            var deliveryFee = subTotal > 10000 ? 0 : 500;
+            var subtotal = items.Sum(item => item.Price * item.Quantity);
+            var deliveryFee = subtotal > 10000 ? 0 : 500;
 
             var order = new Order
             {
-                Orderitems = items,
+                OrderItems = items,
                 BuyerId = User.Identity.Name,
                 ShippingAddress = orderDto.ShippingAddress,
-                SubTotal = subTotal,
+                Subtotal = subtotal,
                 DeliveryFee = deliveryFee,
                 PaymentIntentId = basket.PaymentIntentId
             };
@@ -103,7 +92,7 @@ namespace API.Controllers
                 var user = await _context.Users
                     .Include(a => a.Address)
                     .FirstOrDefaultAsync(x => x.UserName == User.Identity.Name);
-                if (user == null) return BadRequest(new ProblemDetails { Title = "Can't find user record" });
+
                 var address = new UserAddress
                 {
                     FullName = orderDto.ShippingAddress!.FullName,
@@ -114,14 +103,14 @@ namespace API.Controllers
                     Zip = orderDto.ShippingAddress.Zip,
                     Country = orderDto.ShippingAddress.Country
                 };
-                user.Address = address;
+                user!.Address = address;
             }
 
             var result = await _context.SaveChangesAsync() > 0;
 
             if (result) return CreatedAtRoute("GetOrder", new { id = order.Id }, order.Id);
 
-            return BadRequest(new ProblemDetails { Title = "Problem creating order" });
+            return BadRequest("Problem creating order");
         }
     }
 }

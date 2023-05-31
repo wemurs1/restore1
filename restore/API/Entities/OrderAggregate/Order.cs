@@ -10,15 +10,15 @@ namespace API.Entities.OrderAggregate
         [Required]
         public ShippingAddress? ShippingAddress { get; set; }
         public DateTime OrderDate { get; set; } = DateTime.Now;
-        public List<OrderItem> Orderitems { get; set; } = new List<OrderItem>();
-        public long SubTotal { get; set; }
+        public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public long Subtotal { get; set; }
         public long DeliveryFee { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
         public string? PaymentIntentId { get; set; }
 
         public long GetTotal()
         {
-            return SubTotal + DeliveryFee;
+            return Subtotal + DeliveryFee;
         }
     }
 }

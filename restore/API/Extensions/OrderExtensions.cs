@@ -15,11 +15,11 @@ namespace API.Extensions
                     BuyerId = order.BuyerId,
                     ShippingAddress = order.ShippingAddress,
                     OrderDate = order.OrderDate,
-                    SubTotal = order.SubTotal,
+                    SubTotal = order.Subtotal,
                     DeliveryFee = order.DeliveryFee,
                     OrderStatus = order.OrderStatus.ToString(),
                     Total = order.GetTotal(),
-                    Orderitems = order.Orderitems.Select(orderItem => new OrderItemDto
+                    OrderItems = order.OrderItems.Select(orderItem => new OrderItemDto
                     {
                         ProductId = orderItem.ItemOrdered!.ProductId,
                         Name = orderItem.ItemOrdered.Name,

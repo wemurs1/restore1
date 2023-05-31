@@ -84,7 +84,7 @@ const Account = {
 }
 
 const Orders = {
-  list: (params: URLSearchParams) => requests.get('orders', params),
+  list: () => requests.get('orders'),
   fetch: (id: number) => requests.get(`orders/${id}`),
   create: (values: any) => requests.post('orders', values),
   refreshMetaData: (params: URLSearchParams) => requests.get('orders/getMetaData', params)
