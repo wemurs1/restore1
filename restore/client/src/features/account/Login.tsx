@@ -1,8 +1,16 @@
-import './../../app/layout/auth.css';
-import * as FaIcon from 'react-icons/fa';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { LockOutlined } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import {
+  Avatar,
+  Box,
+  Container,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { FieldValues, useForm } from 'react-hook-form';
-import { Spinner } from 'react-bootstrap';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../app/store/configureStore';
 import { signInUserAsync } from './accountSlice';
 
@@ -13,7 +21,7 @@ export default function Login() {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, isValid, errors },
+    formState: { isSubmitting, errors, isValid },
   } = useForm({
     mode: 'onTouched',
   });
@@ -22,71 +30,72 @@ export default function Login() {
     try {
       await dispatch(signInUserAsync(data));
       navigate(location.state?.from || '/catalog');
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
     }
   }
 
   return (
-    <div className='Auth-form-container'>
-      <form className='Auth-form' onSubmit={handleSubmit(submitForm)}>
-        <div className='Auth-form-content'>
-          <h3 className='Auth-form-icon'>
-            <FaIcon.FaLock />
-          </h3>
-          <h3 className='Auth-form-title'>Sign In</h3>
-          <div className='form-group mt-3'>
-            <label>User name</label>
-            <input
-              type='text'
-              autoFocus
-              {...register('username', { required: 'Username is required' })}
-              className={`form-control mt-1 ${
-                errors.username ? 'is-invalid' : ''
-              }`}
-              placeholder='Enter Username'
-            />
-            <div className='invalid-feedback'>
-              {errors.username?.message as string}
-            </div>
-          </div>
-          <div className='form-group mt-3'>
-            <label>Password</label>
-            <input
-              type='password'
-              placeholder='Enter password'
-              {...register('password', { required: 'Password is required' })}
-              className={`form-control mt-1 ${
-                errors.username ? 'is-invalid' : ''
-              }`}
-            />
-            <div className='invalid-feedback'>
-              {errors.password?.message as string}
-            </div>
-          </div>
-          <div className='d-grid gap-2 mt-3'>
-            <button
-              type='submit'
-              className='btn btn-primary'
-              disabled={!isValid}
-            >
-              {isSubmitting && (
-                <Spinner
-                  as='span'
-                  animation='border'
-                  size='sm'
-                  role='status'
-                  aria-hidden='true'
-                />
-              )}
-              Submit
-            </button>
-          </div>
-          <div className='text-end mt-2'>
-            <Link to='/register'>Don't have an account? Sign Up</Link>
-          </div>
-        </div>
-      </form>
-    </div>
+    <Container
+      component={Paper}
+      maxWidth='sm'
+      sx={{
+        p: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <LockOutlined />
+      </Avatar>
+      <Typography component='h1' variant='h5'>
+        Sign in
+      </Typography>
+      <Box
+        component='form'
+        onSubmit={handleSubmit(submitForm)}
+        noValidate
+        sx={{ mt: 1 }}
+      >
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          label='Username'
+          autoFocus
+          {...register('username', { required: 'Username is required' })}
+          error={!!errors.username}
+          helperText={errors?.username?.message as string}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          label='Password'
+          type='password'
+          {...register('password', { required: 'Password is required' })}
+          error={!!errors.password}
+          helperText={errors?.password?.message as string}
+        />
+        <LoadingButton
+          disabled={!isValid}
+          loading={isSubmitting}
+          type='submit'
+          fullWidth
+          variant='contained'
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Sign In
+        </LoadingButton>
+        <Grid container>
+          <Grid item>
+            <Link to='/register' style={{ textDecoration: 'none' }}>
+              {"Don't have an account? Sign Up"}
+            </Link>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
   );
 }

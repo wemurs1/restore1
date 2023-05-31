@@ -21,7 +21,9 @@ namespace API.Extensions
                     Brand = item.Product.Brand,
                     Type = item.Product.Type,
                     Quantity = item.Quantity
-                }).ToList()
+                }).ToList(),
+                PaymentIntentId = basket.PaymentIntentId,
+                ClientSecret = basket.ClientSecret
             };
         }
 

@@ -1,5 +1,9 @@
-import { useState } from 'react';
-import { Form } from 'react-bootstrap';
+import {
+  FormControl,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from '@mui/material';
 
 interface Props {
   options: any[];
@@ -12,25 +16,18 @@ export default function RadioButtonGroup({
   onChange,
   selectedValue,
 }: Props) {
-  const [sortOptionSelected, setSortOptionSelected] = useState(selectedValue);
-
   return (
-    <Form.Group controlId='formSortSelect'>
-      {options.map(({ value, label }, index) => {
-        return (
-          <Form.Check
-            key={index}
-            type='radio'
+    <FormControl component='fieldset'>
+      <RadioGroup onChange={onChange} value={selectedValue}>
+        {options.map(({ value, label }) => (
+          <FormControlLabel
             value={value}
+            control={<Radio />}
             label={label}
-            onChange={(event: any) => {
-              setSortOptionSelected(event.target.value);
-              onChange(event);
-            }}
-            checked={sortOptionSelected === value}
+            key={value}
           />
-        );
-      })}
-    </Form.Group>
+        ))}
+      </RadioGroup>
+    </FormControl>
   );
 }

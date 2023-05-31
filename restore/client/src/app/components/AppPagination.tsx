@@ -1,4 +1,5 @@
-import ReactPaginate from 'react-paginate';
+import { Box, Typography, Pagination } from '@mui/material';
+import { useState } from 'react';
 import { MetaData } from '../models/pagination';
 
 interface Props {
@@ -7,33 +8,35 @@ interface Props {
 }
 
 export default function AppPagination({ metaData, onPageChange }: Props) {
-  const { pageSize, totalCount, totalPages, currentPage } = metaData;
+  const { pageSize, currentPage, totalCount, totalPages } = metaData;
+  const [pageNumber, setPageNumber] = useState(currentPage);
+
+  function handlePageChange(page: number) {
+    setPageNumber(page);
+    onPageChange(page);
+  }
+
   return (
-    <div className='row'>
-      <div className='col-4'>
-        <p>
-          Displaying {(currentPage - 1) * pageSize + 1}-
-          {currentPage * pageSize > totalCount
-            ? totalCount
-            : currentPage * pageSize}{' '}
-          of {totalCount} items
-        </p>
-      </div>
-      <div className='col-8'>
-        <div>
-          <ReactPaginate
-            breakLabel='...'
-            nextLabel='next >'
-            onPageChange={(event: any) => onPageChange(event.selected + 1)}
-            pageRangeDisplayed={2}
-            pageCount={totalPages!}
-            previousLabel='< previous'
-            renderOnZeroPageCount={null}
-            className='react-paginate'
-            forcePage={currentPage - 1}
-          />
-        </div>
-      </div>
-    </div>
+    <Box
+      display='flex'
+      justifyContent='space-between'
+      alignItems='center'
+      sx={{ marginBottom: 3 }}
+    >
+      <Typography variant='body1'>
+        Displaying {(currentPage - 1) * pageSize + 1}-
+        {currentPage * pageSize > totalCount!
+          ? totalCount
+          : currentPage * pageSize}{' '}
+        of {totalCount} results
+      </Typography>
+      <Pagination
+        color='secondary'
+        size='large'
+        count={totalPages}
+        page={pageNumber}
+        onChange={(e, page) => handlePageChange(page)}
+      />
+    </Box>
   );
 }

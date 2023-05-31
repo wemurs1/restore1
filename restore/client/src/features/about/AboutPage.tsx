@@ -1,74 +1,80 @@
 import {
   Alert,
+  AlertTitle,
   Button,
   ButtonGroup,
   Container,
-  ListGroup,
-} from 'react-bootstrap';
-import agent from '../../app/api/agent';
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from '@mui/material';
 import { useState } from 'react';
+import agent from '../../app/api/agent';
 
-function AboutPage() {
+export default function AboutPage() {
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   function getValidationError() {
     agent.TestErrors.getValidationError()
-      .then(() => console.log('should not see this'))
+      .then(() => console.log('should not see this!'))
       .catch((error) => setValidationErrors(error));
   }
 
   return (
     <Container>
-      <h2>Errors for testing purposes</h2>
-      <ButtonGroup>
+      <Typography gutterBottom variant={'h2'}>
+        Errors for testing purposes
+      </Typography>
+      <ButtonGroup fullWidth>
         <Button
-          variant='primary'
           onClick={() =>
             agent.TestErrors.get400Error().catch((error) => console.log(error))
           }
+          variant={'contained'}
         >
-          Test 400 Error
+          Test 400 error
         </Button>
         <Button
-          variant='primary'
           onClick={() =>
             agent.TestErrors.get401Error().catch((error) => console.log(error))
           }
+          variant={'contained'}
         >
-          Test 401 Error
+          Test 401 error
         </Button>
         <Button
-          variant='primary'
           onClick={() =>
             agent.TestErrors.get404Error().catch((error) => console.log(error))
           }
+          variant={'contained'}
         >
-          Test 404 Error
+          Test 404 error
         </Button>
         <Button
-          variant='primary'
           onClick={() =>
             agent.TestErrors.get500Error().catch((error) => console.log(error))
           }
+          variant={'contained'}
         >
-          Test 500 Error
+          Test 500 error
         </Button>
-        <Button variant='primary' onClick={getValidationError}>
-          Test Validation Error
+        <Button onClick={getValidationError} variant={'contained'}>
+          Test validation error
         </Button>
       </ButtonGroup>
       {validationErrors.length > 0 && (
-        <Alert variant='error'>
-          <Alert.Heading>Validation Errors</Alert.Heading>
-          <ListGroup>
+        <Alert severity='error'>
+          <AlertTitle>Validation Errors</AlertTitle>
+          <List>
             {validationErrors.map((error) => (
-              <ListGroup.Item key={error}>{error}</ListGroup.Item>
+              <ListItem key={error}>
+                <ListItemText>{error}</ListItemText>
+              </ListItem>
             ))}
-          </ListGroup>
+          </List>
         </Alert>
       )}
     </Container>
   );
 }
-
-export default AboutPage;

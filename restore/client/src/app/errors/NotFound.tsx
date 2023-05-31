@@ -1,16 +1,16 @@
-import { Container } from 'react-bootstrap';
+import { Container, Paper, Typography, Divider, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 export default function NotFound() {
   return (
-    <Container>
-      <h3 className='mb-3'>
-        Oops - we could not find what you are looking for...
-      </h3>
-      <hr />
-      <Link to='/catalog'>
-        <button className='btn btn-primary w-100'>Go back to shop</button>
-      </Link>
+    <Container component={Paper} style={{ height: 400 }}>
+      <Typography gutterBottom variant={'h3'}>
+        Oops - we could not find what your are looking for!
+      </Typography>
+      <Divider />
+      <Button component={Link} to='/catalog' fullWidth>
+        Go back to the shop
+      </Button>
     </Container>
   );
 }

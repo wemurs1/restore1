@@ -1,10 +1,18 @@
-import './../../app/layout/auth.css';
-import * as FaIcon from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
+import { LockOutlined } from '@mui/icons-material';
+import { LoadingButton } from '@mui/lab';
+import {
+  Avatar,
+  Box,
+  Container,
+  Grid,
+  Paper,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { useForm } from 'react-hook-form';
-import { Spinner } from 'react-bootstrap';
-import agent from '../../app/api/agent';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import agent from '../../app/api/agent';
 
 export default function Register() {
   const navigate = useNavigate();
@@ -12,14 +20,15 @@ export default function Register() {
     register,
     handleSubmit,
     setError,
-    formState: { isSubmitting, isValid, errors },
+    formState: { isSubmitting, errors, isValid },
   } = useForm({
     mode: 'onTouched',
   });
 
   function handleApiErrors(errors: any) {
+    console.log(errors);
     if (errors) {
-      errors.forEach((error: string) => {
+      errors.forEach((error: string, index: number) => {
         if (error.includes('Password')) {
           setError('password', { message: error });
         } else if (error.includes('Email')) {
@@ -32,9 +41,24 @@ export default function Register() {
   }
 
   return (
-    <div className='Auth-form-container'>
-      <form
-        className='Auth-form'
+    <Container
+      component={Paper}
+      maxWidth='sm'
+      sx={{
+        p: 4,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
+      <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+        <LockOutlined />
+      </Avatar>
+      <Typography component='h1' variant='h5'>
+        Register
+      </Typography>
+      <Box
+        component='form'
         onSubmit={handleSubmit((data) =>
           agent.Account.register(data)
             .then(() => {
@@ -43,91 +67,68 @@ export default function Register() {
             })
             .catch((error) => handleApiErrors(error))
         )}
+        noValidate
+        sx={{ mt: 1 }}
       >
-        <div className='Auth-form-content'>
-          <h3 className='Auth-form-icon'>
-            <FaIcon.FaLock />
-          </h3>
-          <h3 className='Auth-form-title'>Register</h3>
-          <div className='form-group mt-3'>
-            <label>User name</label>
-            <input
-              type='text'
-              autoFocus
-              {...register('username', { required: 'Username is required' })}
-              className={`form-control mt-1 ${
-                errors.username ? 'is-invalid' : ''
-              }`}
-              placeholder='Enter Username'
-            />
-            <div className='invalid-feedback'>
-              {errors.username?.message as string}
-            </div>
-          </div>
-          <div className='form-group mt-3'>
-            <label>Email Address</label>
-            <input
-              type='text'
-              {...register('email', {
-                required: 'Email is required',
-                pattern: {
-                  // eslint-disable-next-line no-useless-escape
-                  value: /^\w+[\w-\.]*\@\w+((-\w+)|(\w*))\.[a-z]{2,3}$/,
-                  message: 'Not a valid email address',
-                },
-              })}
-              className={`form-control mt-1 ${
-                errors.email ? 'is-invalid' : ''
-              }`}
-              placeholder='Enter Email'
-            />
-            <div className='invalid-feedback'>
-              {errors.email?.message as string}
-            </div>
-          </div>
-          <div className='form-group mt-3'>
-            <label>Password</label>
-            <input
-              type='password'
-              placeholder='Enter password'
-              {...register('password', {
-                required: 'Password is required',
-                pattern: {
-                  value: /(?=^.{6,10}$)(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&amp;*()_+}{&quot;:;'?/&gt;.&lt;,])(?!.*\s).*$/,
-                  message: 'Password does not meet complexity requirements',
-                },
-              })}
-              className={`form-control mt-1 ${
-                errors.username ? 'is-invalid' : ''
-              }`}
-            />
-            <div className='invalid-feedback'>
-              {errors.password?.message as string}
-            </div>
-          </div>
-          <div className='d-grid gap-2 mt-3'>
-            <button
-              type='submit'
-              className='btn btn-primary'
-              disabled={!isValid}
-            >
-              {isSubmitting && (
-                <Spinner
-                  as='span'
-                  animation='border'
-                  size='sm'
-                  role='status'
-                  aria-hidden='true'
-                />
-              )}
-              Submit
-            </button>
-          </div>
-          <div className='text-end mt-2'>
-            <Link to='/login'>Already have an account? Sign In</Link>
-          </div>
-        </div>
-      </form>
-    </div>
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          label='Username'
+          autoFocus
+          {...register('username', { required: 'Username is required' })}
+          error={!!errors.username}
+          helperText={errors?.username?.message as string}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          label='Email'
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^([a-zA-Z0-9_\-.]+)@([a-zA-Z0-9_\-.]+)\.([a-zA-Z]{2,5})$/,
+              message: 'Not a valid email address',
+            },
+          })}
+          error={!!errors.email}
+          helperText={errors?.email?.message as string}
+        />
+        <TextField
+          margin='normal'
+          required
+          fullWidth
+          label='Password'
+          type='password'
+          {...register('password', {
+            required: 'password is required',
+            pattern: {
+              value: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,20}$/,
+              message: 'Password does not meet complexity requirements',
+            },
+          })}
+          error={!!errors.password}
+          helperText={errors?.password?.message as string}
+        />
+        <LoadingButton
+          disabled={!isValid}
+          loading={isSubmitting}
+          type='submit'
+          fullWidth
+          variant='contained'
+          sx={{ mt: 3, mb: 2 }}
+        >
+          Register
+        </LoadingButton>
+        <Grid container>
+          <Grid item>
+            <Link to='/login' style={{ textDecoration: 'none' }}>
+              {'Already have an account? Sign In'}
+            </Link>
+          </Grid>
+        </Grid>
+      </Box>
+    </Container>
   );
 }

@@ -1,20 +1,25 @@
-import { Fragment } from 'react';
-import { Container } from 'react-bootstrap';
+import { Container, Divider, Paper, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 
 export default function ServerError() {
   const { state } = useLocation();
 
   return (
-    <Container>
+    <Container component={Paper}>
       {state?.error ? (
-        <Fragment>
-          <h2 className='mb-3 text-secondary'>{state.error.title}</h2>
-          <hr />
-          <p>{state.error.detail || 'Internal server error'}</p>
-        </Fragment>
+        <>
+          <Typography gutterBottom variant='h3' color='secondary'>
+            {state.error.title}
+          </Typography>
+          <Divider />
+          <Typography variant='body1'>
+            {state.error.detail || 'Internal server error'}
+          </Typography>
+        </>
       ) : (
-        <h2 className='mb-3'>Server Error</h2>
+        <Typography gutterBottom variant='h5'>
+          Server error
+        </Typography>
       )}
     </Container>
   );
