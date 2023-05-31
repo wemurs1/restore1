@@ -90,12 +90,17 @@ const Orders = {
   refreshMetaData: (params: URLSearchParams) => requests.get('orders/getMetaData', params)
 }
 
+const Payments = {
+  createPaymentIntent: () => requests.post('payments', {})
+}
+
 const agent = {
   Catalog,
   Basket,
   TestErrors,
   Account,
-  Orders
+  Orders,
+  Payments
 };
 
 export default agent;
