@@ -15,8 +15,15 @@ namespace API.Controllers
         private readonly IPaymentService _paymentService;
         private readonly StoreContext _context;
         private readonly IConfiguration _config;
-        public PaymentsController(IPaymentService paymentService, StoreContext context, IConfiguration config)
+        private readonly ILogger<PaymentsController> _logger;
+        public PaymentsController(
+            IPaymentService paymentService,
+            StoreContext context,
+            IConfiguration config,
+            ILogger<PaymentsController> logger
+        )
         {
+            _logger = logger;
             _config = config;
             _context = context;
             _paymentService = paymentService;
@@ -57,15 +64,28 @@ namespace API.Controllers
                 _config["StripeSettings:WhSecret"]
             );
 
-            var charge = (Charge)stripeEvent.Data.Object;
+            _logger.LogInformation(stripeEvent.Type);
 
-            var order = await _context.Orders.FirstOrDefaultAsync(x => x.PaymentIntentId == charge.PaymentIntentId);
+            if (stripeEvent.Type.Contains("charge."))
+            {
+                _logger.LogInformation($"Charge Event: {stripeEvent.Type}");
 
-            if (order == null) throw new Exception("Order not found");
+                var charge = (Charge)stripeEvent.Data.Object;
 
-            if (charge.Status == "succeeded") order.OrderStatus = OrderStatus.PaymentReceived;
+                var order = await _context.Orders.FirstOrDefaultAsync(x => x.PaymentIntentId == charge.PaymentIntentId);
 
-            await _context.SaveChangesAsync();
+                if (order == null) throw new Exception("Order not found");
+
+                if (charge.Status == "succeeded")
+                {
+                    order.OrderStatus = OrderStatus.PaymentReceived;
+                    await _context.SaveChangesAsync();
+                }
+            }
+            else
+            {
+                _logger.LogInformation($"Unexpected Event: {stripeEvent.Type}");
+            }
 
             return new EmptyResult();
         }
