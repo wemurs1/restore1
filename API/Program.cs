@@ -26,12 +26,13 @@ else
     var pgHostPortDb = connUrl.Split("@")[1];
     var pgHostPort = pgHostPortDb.Split("/")[0];
     var pgDb = pgHostPortDb.Split("/")[1];
+    var pgDbStripped = pgDb.Split("?")[0];
     var pgUser = pgUserPass.Split(":")[0];
     var pgPass = pgUserPass.Split(":")[1];
     var pgHost = pgHostPort.Split(":")[0];
     var pgPort = pgHostPort.Split(":")[1];
 
-    connString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};SSL Mode=Disable";
+    connString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDbStripped};SSL Mode=Disable";
 }
 builder.Services.AddDbContext<StoreContext>(opt =>
 {
