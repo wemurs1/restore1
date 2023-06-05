@@ -32,6 +32,12 @@ else
     var pgPort = pgHostPort.Split(":")[1];
 
     connString = $"Server={pgHost};Port={pgPort};User Id={pgUser};Password={pgPass};Database={pgDb};";
+    using var loggerFactory = LoggerFactory.Create(loggingBuilder => loggingBuilder
+    .SetMinimumLevel(LogLevel.Trace)
+    .AddConsole());
+
+    ILogger dbLogger = loggerFactory.CreateLogger<Program>();
+    dbLogger.LogInformation(connString);
 }
 builder.Services.AddDbContext<StoreContext>(opt =>
 {
