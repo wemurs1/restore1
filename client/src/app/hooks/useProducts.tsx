@@ -13,7 +13,9 @@ export default function useProducts() {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!productsLoaded) dispatch(fetchProductsAsync());
+    if (!productsLoaded) {
+      dispatch(fetchProductsAsync());
+    }
   }, [productsLoaded, dispatch]);
 
   useEffect(() => {
